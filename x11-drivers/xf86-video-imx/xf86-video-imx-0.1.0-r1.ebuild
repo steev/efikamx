@@ -24,4 +24,5 @@ DEPEND="${RDEPEND}
 	x11-proto/xproto
 	>=sys-libs/imx-lib-09.12.01"
 
-PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch" )
+PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch" 
+	"${FILESDIR}/${P}-update-exa-2.4-2.5.patch" )
