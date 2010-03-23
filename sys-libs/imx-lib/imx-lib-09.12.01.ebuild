@@ -6,7 +6,7 @@ EAPI=3
 
 DESCRIPTION="IMX{31,51} System library"
 HOMEPAGE=""
-SRC_URI="${P}.tar.gz"
+SRC_URI="http://ubersekret.com/distfiles/${P}.tar.gz"
 
 LICENSE=""
 SLOT="0"

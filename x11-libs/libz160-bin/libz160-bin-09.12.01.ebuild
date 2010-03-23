@@ -10,7 +10,7 @@ EAPI=3
 
 DESCRIPTION="libz160"
 HOMEPAGE=""
-SRC_URI="${P}.tar.gz"
+SRC_URI="http://ubersekret.com/distfiles/${P}.tar.gz"
 RESTRICT="strip mirror"
 
 LICENSE=""

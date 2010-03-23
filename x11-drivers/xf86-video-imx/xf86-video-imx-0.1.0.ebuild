@@ -7,7 +7,7 @@ inherit xorg-2
 
 DESCRIPTION="xf86 imx driver"
 HOMEPAGE=""
-SRC_URI="${P}.tar.bz2"
+SRC_URI="http://ubersekret.com/distfiles/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
