@@ -26,3 +26,6 @@ DEPEND="${RDEPEND}
 
 PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch" 
 	"${FILESDIR}/${P}-update-exa-2.4-2.5.patch" )
+
+#TODO
+# Need to eautoreconf due to the exa update (it touches Makefile.am)
