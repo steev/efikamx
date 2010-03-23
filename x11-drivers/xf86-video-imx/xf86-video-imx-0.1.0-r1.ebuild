@@ -24,6 +24,4 @@ DEPEND="${RDEPEND}
 	x11-proto/xproto
 	>=sys-libs/imx-lib-09.12.01"
 
-PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch"
-	"${FILESDIR}/${P}-remove-Symbols.patch"
-	"${FILESDIR}/${P}-remove-Symbols-for-exa-too.patch" )
+PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch" )
