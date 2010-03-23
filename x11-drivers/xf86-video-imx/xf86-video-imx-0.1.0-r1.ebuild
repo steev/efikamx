@@ -11,7 +11,7 @@ SRC_URI="${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~arm"
+KEYWORDS=""
 IUSE=""
 
 RDEPEND="x11-base/xorg-server
@@ -24,4 +24,6 @@ DEPEND="${RDEPEND}
 	x11-proto/xproto
 	>=sys-libs/imx-lib-09.12.01"
 
-PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch" )
+PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch"
+	"${FILESDIR}/${P}-remove-Symbols.patch"
+	"${FILESDIR}/${P}-remove-Symbols-for-exa-too.patch" )

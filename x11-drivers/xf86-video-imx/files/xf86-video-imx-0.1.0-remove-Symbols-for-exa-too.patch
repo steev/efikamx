@@ -1,0 +1,29 @@
+diff -ruN xf86-video-imx-0.1.0.orig//src/imx_exa_z160.c xf86-video-imx-0.1.0/src/imx_exa_z160.c
+--- xf86-video-imx-0.1.0.orig//src/imx_exa_z160.c	2009-12-09 18:24:49.000000000 -0600
++++ xf86-video-imx-0.1.0/src/imx_exa_z160.c	2010-03-22 20:25:24.279613604 -0500
+@@ -103,6 +103,7 @@
+ #if !IMX_EXA_ENABLE_EXA_INTERNAL
+ 
+ /* Function symbols dynamically loaded from EXA module. */
++/*
+ static const char *exaSymbols[] = {
+ 	"exaDriverAlloc",
+ 	"exaDriverInit",
+@@ -118,7 +119,7 @@
+ 	"exaWaitSync",
+ 	NULL
+ };
+-
++*/
+ #endif
+ 
+ /* Prototype for function not defined in exa.h */
+@@ -1824,7 +1825,7 @@
+ 	}
+ 
+ 	/* Load required EXA symbols */
+-	xf86LoaderReqSymLists(exaSymbols, NULL);
++/*	xf86LoaderReqSymLists(exaSymbols, NULL); */
+ #endif
+ 
+ 	/* initialize state of Z160 data structures */
