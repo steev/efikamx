@@ -34,6 +34,8 @@ PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch"
 
 #TODO
 # Need to autoreconf due to the exa update (it touches Makefile.am)
+# Fix the autoreconf stuff, this way is ugly and causes QA warnings.
+# Fix the patches... one of them puts stuff where it shouldn't be...
 src_prepare() {
 	xorg-2_src_unpack
 	xorg-2_patch_source
