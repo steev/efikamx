@@ -29,7 +29,6 @@ DEPEND="${RDEPEND}
 
 PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch" 
 	"${FILESDIR}/${P}-remove-Symbols.patch"
-	"${FILESDIR}/${P}-kill-Resources.patch"
 	"${FILESDIR}/${P}-update-exa-2.4-2.5.patch" )
 
 #TODO
