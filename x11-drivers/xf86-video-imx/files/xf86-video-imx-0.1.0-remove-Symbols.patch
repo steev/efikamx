@@ -1,6 +1,6 @@
 diff -ruN xf86-video-imx-0.1.0.orig//src/imx_drv.c xf86-video-imx-0.1.0/src/imx_drv.c
---- xf86-video-imx-0.1.0.orig//src/imx_drv.c	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/imx_drv.c	2010-03-24 00:57:42.099312630 -0500
+--- src/imx_drv.c	2009-12-09 18:24:49.000000000 -0600
++++ src/imx_drv.c	2010-03-24 00:57:42.099312630 -0500
 @@ -137,67 +137,6 @@
  
  /* -------------------------------------------------------------------- */
@@ -123,8 +123,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/imx_drv.c xf86-video-imx-0.1.0/src/imx_
  
  	TRACE_EXIT("PreInit");
 diff -ruN xf86-video-imx-0.1.0.orig//src/imx_exa_z160.c xf86-video-imx-0.1.0/src/imx_exa_z160.c
---- xf86-video-imx-0.1.0.orig//src/imx_exa_z160.c	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/imx_exa_z160.c	2010-03-24 00:56:24.379299758 -0500
+--- src/imx_exa_z160.c	2009-12-09 18:24:49.000000000 -0600
++++ src/imx_exa_z160.c	2010-03-24 00:56:24.379299758 -0500
 @@ -100,27 +100,6 @@
  
  #define IMXEXAPTR(p) ((IMXEXAPtr)((p)->exaDriverPrivate))

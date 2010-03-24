@@ -1,6 +1,6 @@
 diff -ruN xf86-video-imx-0.1.0//src/imx_drv.c /home/steev/xf86-video-imx-0.1.0//src/imx_drv.c
---- xf86-video-imx-0.1.0//src/imx_drv.c	2009-12-09 18:24:49.000000000 -0600
-+++ /home/steev/xf86-video-imx-0.1.0//src/imx_drv.c	2010-03-24 01:43:57.129302308 -0500
+--- src/imx_drv.c	2009-12-09 18:24:49.000000000 -0600
++++ src/imx_drv.c	2010-03-24 01:43:57.129302308 -0500
 @@ -38,10 +38,10 @@
  
  /* for visuals */

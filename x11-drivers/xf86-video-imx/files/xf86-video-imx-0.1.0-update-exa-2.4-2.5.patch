@@ -1,6 +1,6 @@
 diff -ruN xf86-video-imx-0.1.0.orig//src/Makefile.am xf86-video-imx-0.1.0/src/Makefile.am
---- xf86-video-imx-0.1.0.orig//src/Makefile.am	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/Makefile.am	2010-03-23 10:27:18.429611599 -0500
+--- src/Makefile.am	2009-12-09 18:24:49.000000000 -0600
++++ src/Makefile.am	2010-03-23 10:27:18.429611599 -0500
 @@ -41,8 +41,12 @@
  	exa/exa.c \
  	exa/exa.h \
@@ -16,8 +16,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/Makefile.am xf86-video-imx-0.1.0/src/Ma
  	exa/exa_render.c \
  	exa/exa_priv.h \
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa.c xf86-video-imx-0.1.0/src/exa/exa.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa.c	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa.c	2010-03-23 01:05:55.419614599 -0500
+--- src/exa/exa.c	2009-12-09 18:24:49.000000000 -0600
++++ src/exa/exa.c	2010-03-23 01:05:55.419614599 -0500
 @@ -41,22 +41,13 @@
  DevPrivateKey exaScreenPrivateKey = &exaScreenPrivateKeyIndex;
  static int exaPixmapPrivateKeyIndex;
@@ -1430,8 +1430,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa.c xf86-video-imx-0.1.0/src/exa/
 +	(*pExaScr->do_move_out_pixmap)(pPixmap);
 +}
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa.h xf86-video-imx-0.1.0/src/exa/exa.h
---- xf86-video-imx-0.1.0.orig//src/exa/exa.h	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa.h	2010-03-23 01:05:55.419614599 -0500
+--- src/exa/exa.h	2009-12-09 18:24:49.000000000 -0600
++++ src/exa/exa.h	2010-03-23 01:05:55.419614599 -0500
 @@ -39,7 +39,7 @@
  #include "fb.h"
  
@@ -1680,8 +1680,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa.h xf86-video-imx-0.1.0/src/exa/
  
  
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_accel.c xf86-video-imx-0.1.0/src/exa/exa_accel.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_accel.c	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_accel.c	2010-03-23 01:05:55.419614599 -0500
+--- src/exa/exa_accel.c	2009-12-09 18:24:49.000000000 -0600
++++ src/exa/exa_accel.c	2010-03-23 01:05:55.419614599 -0500
 @@ -50,20 +50,24 @@
      int		    fullX1, fullX2, fullY1;
      int		    partX1, partX2;
@@ -2419,8 +2419,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_accel.c xf86-video-imx-0.1.0/sr
 +    ExaCheckGetImage(pDrawable, x, y, w, h, format, planeMask, d);
  }
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_classic.c xf86-video-imx-0.1.0/src/exa/exa_classic.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_classic.c	1969-12-31 18:00:00.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_classic.c	2010-03-23 01:05:55.419614599 -0500
+--- src/exa/exa_classic.c	1969-12-31 18:00:00.000000000 -0600
++++ src/exa/exa_classic.c	2010-03-23 01:05:55.419614599 -0500
 @@ -0,0 +1,266 @@
 +/*
 + * Copyright © 2009 Maarten Maathuis
@@ -2689,8 +2689,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_classic.c xf86-video-imx-0.1.0/
 +    return ret;
 +}
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_driver.c xf86-video-imx-0.1.0/src/exa/exa_driver.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_driver.c	1969-12-31 18:00:00.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_driver.c	2010-03-23 01:05:55.419614599 -0500
+--- src/exa/exa_driver.c	1969-12-31 18:00:00.000000000 -0600
++++ src/exa/exa_driver.c	2010-03-23 01:05:55.419614599 -0500
 @@ -0,0 +1,225 @@
 +/*
 + * Copyright © 2009 Maarten Maathuis
@@ -2918,8 +2918,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_driver.c xf86-video-imx-0.1.0/s
 +    return ret;
 +}
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_glyphs.c xf86-video-imx-0.1.0/src/exa/exa_glyphs.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_glyphs.c	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_glyphs.c	2010-03-23 01:05:55.419614599 -0500
+--- src/exa/exa_glyphs.c	2009-12-09 18:24:49.000000000 -0600
++++ src/exa/exa_glyphs.c	2010-03-23 01:05:55.419614599 -0500
 @@ -68,7 +68,7 @@
  #define GLYPH_BUFFER_SIZE 256
  
@@ -3563,8 +3563,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_glyphs.c xf86-video-imx-0.1.0/s
  			  x, y,
  			  width, height);
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_migration.c xf86-video-imx-0.1.0/src/exa/exa_migration.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_migration.c	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_migration.c	1969-12-31 18:00:00.000000000 -0600
+--- src/exa/exa_migration.c	2009-12-09 18:24:49.000000000 -0600
++++ src/exa/exa_migration.c	1969-12-31 18:00:00.000000000 -0600
 @@ -1,702 +0,0 @@
 -/*
 - * Copyright © 2006 Intel Corporation
@@ -4269,8 +4269,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_migration.c xf86-video-imx-0.1.
 -    }
 -}
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_migration_classic.c xf86-video-imx-0.1.0/src/exa/exa_migration_classic.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_migration_classic.c	1969-12-31 18:00:00.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_migration_classic.c	2010-03-23 01:05:55.419614599 -0500
+--- src/exa/exa_migration_classic.c	1969-12-31 18:00:00.000000000 -0600
++++ src/exa/exa_migration_classic.c	2010-03-23 01:05:55.419614599 -0500
 @@ -0,0 +1,745 @@
 +/*
 + * Copyright © 2006 Intel Corporation
@@ -5018,8 +5018,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_migration_classic.c xf86-video-
 +    (void)ExaDoPrepareAccess(pPixmap, index);
 +}
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_migration_mixed.c xf86-video-imx-0.1.0/src/exa/exa_migration_mixed.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_migration_mixed.c	1969-12-31 18:00:00.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_migration_mixed.c	2010-03-23 01:05:55.419614599 -0500
+--- src/exa/exa_migration_mixed.c	1969-12-31 18:00:00.000000000 -0600
++++ src/exa/exa_migration_mixed.c	2010-03-23 01:05:55.419614599 -0500
 @@ -0,0 +1,261 @@
 +/*
 + * Copyright © 2009 Maarten Maathuis
@@ -5283,8 +5283,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_migration_mixed.c xf86-video-im
 +}
 +
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_mixed.c xf86-video-imx-0.1.0/src/exa/exa_mixed.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_mixed.c	1969-12-31 18:00:00.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_mixed.c	2010-03-23 01:05:55.429628350 -0500
+--- src/exa/exa_mixed.c	1969-12-31 18:00:00.000000000 -0600
++++ src/exa/exa_mixed.c	2010-03-23 01:05:55.429628350 -0500
 @@ -0,0 +1,291 @@
 +/*
 + * Copyright © 2009 Maarten Maathuis
@@ -5578,8 +5578,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_mixed.c xf86-video-imx-0.1.0/sr
 +    return ret;
 +}
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_offscreen.c xf86-video-imx-0.1.0/src/exa/exa_offscreen.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_offscreen.c	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_offscreen.c	2010-03-23 01:05:55.429628350 -0500
+--- src/exa/exa_offscreen.c	2009-12-09 18:24:49.000000000 -0600
++++ src/exa/exa_offscreen.c	2010-03-23 01:05:55.429628350 -0500
 @@ -93,7 +93,7 @@
  {
      ExaOffscreenArea *begin, *end, *best;
@@ -5927,8 +5927,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_offscreen.c xf86-video-imx-0.1.
      ExaOffscreenValidate (pScreen);
  
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_priv.h xf86-video-imx-0.1.0/src/exa/exa_priv.h
---- xf86-video-imx-0.1.0.orig//src/exa/exa_priv.h	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_priv.h	2010-03-23 01:05:55.429628350 -0500
+--- src/exa/exa_priv.h	2009-12-09 18:24:49.000000000 -0600
++++ src/exa/exa_priv.h	2010-03-23 01:05:55.429628350 -0500
 @@ -26,16 +26,6 @@
  #ifndef EXAPRIV_H
  #define EXAPRIV_H
@@ -6387,8 +6387,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_priv.h xf86-video-imx-0.1.0/src
 +
  #endif /* EXAPRIV_H */
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_render.c xf86-video-imx-0.1.0/src/exa/exa_render.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_render.c	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_render.c	2010-03-23 01:05:55.429628350 -0500
+--- src/exa/exa_render.c	2009-12-09 18:24:49.000000000 -0600
++++ src/exa/exa_render.c	2010-03-23 01:05:55.429628350 -0500
 @@ -54,6 +54,12 @@
      case PICT_x8r8g8b8:
  	snprintf(format, 20, "XRGB8888");
@@ -7258,8 +7258,8 @@ diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_render.c xf86-video-imx-0.1.0/s
  	yDst = tris[0].p1.y >> 16;
  
 diff -ruN xf86-video-imx-0.1.0.orig//src/exa/exa_unaccel.c xf86-video-imx-0.1.0/src/exa/exa_unaccel.c
---- xf86-video-imx-0.1.0.orig//src/exa/exa_unaccel.c	2009-12-09 18:24:49.000000000 -0600
-+++ xf86-video-imx-0.1.0/src/exa/exa_unaccel.c	2010-03-23 01:05:55.429628350 -0500
+--- src/exa/exa_unaccel.c	2009-12-09 18:24:49.000000000 -0600
++++ src/exa/exa_unaccel.c	2010-03-23 01:05:55.429628350 -0500
 @@ -74,22 +74,26 @@
  ExaCheckFillSpans (DrawablePtr pDrawable, GCPtr pGC, int nspans,
  		   DDXPointPtr ppt, int *pwidth, int fSorted)
