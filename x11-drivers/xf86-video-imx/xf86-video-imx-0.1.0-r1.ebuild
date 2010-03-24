@@ -5,7 +5,8 @@
 EAPI=3
 inherit xorg-2
 
-XORG_EAUTORECONF=yes
+AT_NOELIBTOOLIZE="no"
+#XORG_EAUTORECONF="yes"
 
 DESCRIPTION="xf86 imx driver"
 HOMEPAGE=""
@@ -27,7 +28,16 @@ DEPEND="${RDEPEND}
 	>=sys-libs/imx-lib-09.12.01"
 
 PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch" 
+	"${FILESDIR}/${P}-remove-Symbols.patch"
+	"${FILESDIR}/${P}-kill-Resources.patch"
 	"${FILESDIR}/${P}-update-exa-2.4-2.5.patch" )
 
 #TODO
-# Need to eautoreconf due to the exa update (it touches Makefile.am)
+# Need to autoreconf due to the exa update (it touches Makefile.am)
+src_prepare() {
+	xorg-2_src_unpack
+	xorg-2_patch_source
+	# Need to do this because EAUTORECONF=yes does bad juju
+	aclocal && autoconf && automake || die
+	libtoolize --copy
+}

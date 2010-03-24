@@ -1,0 +1,33 @@
+diff -ruN xf86-video-imx-0.1.0//src/imx_drv.c /home/steev/xf86-video-imx-0.1.0//src/imx_drv.c
+--- xf86-video-imx-0.1.0//src/imx_drv.c	2009-12-09 18:24:49.000000000 -0600
++++ /home/steev/xf86-video-imx-0.1.0//src/imx_drv.c	2010-03-24 01:43:57.129302308 -0500
+@@ -38,10 +38,10 @@
+ 
+ /* for visuals */
+ #include "fb.h"
+-
++#ifndef XSERVER_LIBPCIACCESS
+ #include "xf86Resources.h"
+ #include "xf86RAC.h"
+-
++#endif
+ #include "fbdevhw.h"
+ 
+ #include "xf86xv.h"
+@@ -363,7 +363,7 @@
+ 	fPtr = IMXPTR(pScrn);
+ 
+ 	fPtr->pEnt = xf86GetEntityInfo(pScrn->entityList[0]);
+-
++#ifndef XSERVER_LIBPCIACCESS
+ 	pScrn->racMemFlags = RAC_FB | RAC_COLORMAP | RAC_CURSOR | RAC_VIEWPORT;
+ 	/* XXX Is this right?  Can probably remove RAC_FB */
+ 	pScrn->racIoFlags = RAC_FB | RAC_COLORMAP | RAC_CURSOR | RAC_VIEWPORT;
+@@ -374,6 +374,7 @@
+ 		   "xf86RegisterResources() found resource conflicts\n");
+ 		return FALSE;
+ 	}
++#endif
+ 
+ 	/* open device */
+ 	if (!fbdevHWInit(pScrn,NULL,xf86FindOptionValue(fPtr->pEnt->device->options,"fbdev")))
