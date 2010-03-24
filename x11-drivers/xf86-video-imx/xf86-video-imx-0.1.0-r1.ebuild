@@ -5,6 +5,8 @@
 EAPI=3
 inherit xorg-2
 
+XORG_EAUTORECONF=yes
+
 DESCRIPTION="xf86 imx driver"
 HOMEPAGE=""
 SRC_URI="http://ubersekret.com/distfiles/${P}.tar.bz2"
