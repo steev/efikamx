@@ -39,6 +39,7 @@ IUSE_VIDEO_CARDS="
 	video_cards_i740
 	video_cards_intel
 	video_cards_impact
+	video_cards_imx
 	video_cards_mach64
 	video_cards_mga
 	video_cards_neomagic
@@ -104,6 +105,7 @@ PDEPEND="
 	video_cards_i128?          ( x11-drivers/xf86-video-i128 )
 	video_cards_i740?          ( x11-drivers/xf86-video-i740 )
 	video_cards_intel?         ( x11-drivers/xf86-video-intel )
+	video_cards_imx?		   ( x11-drivers/xf86-video-imx )
 	video_cards_mach64?        ( x11-drivers/xf86-video-mach64 )
 	video_cards_mga?           ( x11-drivers/xf86-video-mga )
 	video_cards_neomagic?      ( x11-drivers/xf86-video-neomagic )
