@@ -3,8 +3,7 @@
 # $Header: $
 
 EAPI=3
-AM_OPTS="--foreign"
-AT_NOELIBTOOLIZE="yes"
+XORG_EAUTORECONF="yes"
 inherit xorg-2
 
 DESCRIPTION="xf86 imx driver"
@@ -28,19 +27,13 @@ DEPEND="${RDEPEND}
 
 PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch"
 	"${FILESDIR}/${P}-remove-Symbols.patch"
-	"${FILESDIR}/${P}-update-exa-2.4-2.5.patch" )
+	"${FILESDIR}/${P}-update-exa-2.4-2.5.patch"
+	"${FILESDIR}/${P}-fix-macro-dir.patch" )
 
-# Need to autoreconf due to the exa update (it touches Makefile.am)
-# And libtoolize bombs from eautoreconf so need to override xorg-2's
-# handling of it.
+# And we override the xorg2 eclass to make the m4 directory that doesn't exist.
 src_prepare() {
 	xorg-2_src_unpack
+	mkdir -p ${S}/m4
 	xorg-2_patch_source
-	eautoconf
-	eaclocal
-	elibtoolize --shallow
-	eaclocal
-	eautoheader
-	eautomake
-	elibtoolize --shallow
+	xorg-2_reconf_source
 }
