@@ -3,7 +3,8 @@
 # $Header: $
 
 EAPI=3
-XORG_EAUTORECONF=yes
+AM_OPTS="--foreign"
+AT_NOELIBTOOLIZE="yes"
 inherit xorg-2
 
 DESCRIPTION="xf86 imx driver"
@@ -30,14 +31,16 @@ PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch"
 	"${FILESDIR}/${P}-update-exa-2.4-2.5.patch" )
 
 # Need to autoreconf due to the exa update (it touches Makefile.am)
-#src_prepare() {
-#	xorg-2_src_unpack
-#	xorg-2_patch_source
-#	eautoconf
-#	eaclocal
-#	elibtoolize --shallow
-#	eaclocal
-#	eautoheader
-#	eautomake
-#	elibtoolize --shallow
-#}
+# And libtoolize bombs from eautoreconf so need to override xorg-2's
+# handling of it.
+src_prepare() {
+	xorg-2_src_unpack
+	xorg-2_patch_source
+	eautoconf
+	eaclocal
+	elibtoolize --shallow
+	eaclocal
+	eautoheader
+	eautomake
+	elibtoolize --shallow
+}
