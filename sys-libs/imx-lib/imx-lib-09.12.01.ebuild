@@ -14,7 +14,9 @@ KEYWORDS="~arm"
 IUSE=""
 
 DEPEND=""
-RDEPEND="${DEPEND}"
+RDEPEND="sys-kernel/efikamx-headers
+		 >=sys-kernel/linux-headers-2.6.33
+		 ${DEPEND}"
 
 src_compile() {
 	emake INCLUDE="-I/usr/src/linux/include \
