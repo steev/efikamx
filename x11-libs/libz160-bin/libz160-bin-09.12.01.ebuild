@@ -7,19 +7,22 @@ EAPI=3
 # This ebuild is by no means complete or work ready.  Need clarification
 # on the LICENSE, as well as the ability to mirror.  Currently the only 
 # way to get the tarball is to download the BSP which is 590MB in size.
+# Initial indications are that I can't host this tarball - They want a
+# clickthrough wrapper.  I've put in a request about this however, if adding it
+# to the EULA license group would be good enough.  
 
 DESCRIPTION="libz160"
 HOMEPAGE=""
 SRC_URI="http://ubersekret.com/distfiles/${P}.tar.gz"
 RESTRICT="strip mirror"
 
-LICENSE=""
+LICENSE="Freescale"
 SLOT="0"
 KEYWORDS="~arm"
 IUSE=""
 
+RDEPEND=""
 DEPEND=""
-RDEPEND="${DEPEND}"
 
 
 
