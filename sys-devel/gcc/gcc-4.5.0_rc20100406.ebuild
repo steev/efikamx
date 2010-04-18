@@ -1,6 +1,6 @@
 # Copyright 1999-2007 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: $
+# $Header: /var/cvsroot/gentoo-x86/sys-devel/gcc/gcc-4.3.0_alpha20070112.ebuild,v 1.1 2007/01/18 05:13:42 vapier Exp $
 
 ETYPE="gcc-compiler"
 GCC_FILESDIR=${PORTDIR}/sys-devel/gcc/files
@@ -10,7 +10,7 @@ inherit toolchain
 DESCRIPTION="The GNU Compiler Collection.  Includes C/C++, java compilers, pie+ssp extensions, Haj Ten Brugge runtime bounds checking"
 HOMEPAGE="http://gcc.gnu.org/"
 LICENSE="GPL-3 LGPL-3 libgcc libstdc++ gcc-runtime-library-exception-3.1"
-KEYWORDS=""
+KEYWORDS="~arm"
 
 IUSE="lto"
 
@@ -57,6 +57,9 @@ if [[ ${CATEGORY} != cross-* ]] ; then
 fi
 
 pkg_setup() {
+#	if [[ -z ${I_PROMISE_TO_SUPPLY_PATCHES_WITH_BUGS} ]] ; then
+#		die "Please \`export I_PROMISE_TO_SUPPLY_PATCHES_WITH_BUGS=1\` or define it in your make.conf if you want to use this ebuild.  This is to try and cut down on people filing bugs for a compiler we do not currently support."
+#	fi
 	toolchain_pkg_setup
 }
 
@@ -67,9 +70,13 @@ src_unpack() {
 
 	# Fix cross-compiling
 	epatch "${GCC_FILESDIR}"/4.1.0/gcc-4.1.0-cross-compile.patch
+	epatch "${FILESDIR}"/PR43698-fix.patch
 
 	# Yes this is ugly
-	EXTRA_ECONF="--enable-checking=assert $(use_enable lto) ${EXTRA_ECONF}"
+	EXTRA_ECONF="$(use_enable lto) ${EXTRA_ECONF} --enable-checking=release"
+	if [[ ${CTARGET} == *-neon-* ]] ; then
+		EXTRA_ECONF="${EXTRA_ECONF} --with-arch=armv7-a --with-fpu=neon --with-float=hard"
+	fi
 }
 
 pkg_postinst() {
