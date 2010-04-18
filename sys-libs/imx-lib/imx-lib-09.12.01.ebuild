@@ -8,14 +8,14 @@ DESCRIPTION="IMX{31,51} System library"
 HOMEPAGE=""
 SRC_URI="http://ubersekret.com/distfiles/${P}.tar.gz"
 
-LICENSE=""
+LICENSE="Freescale GPL-2"
 SLOT="0"
 KEYWORDS="~arm"
 IUSE=""
 
 DEPEND=""
 RDEPEND="sys-kernel/efikamx-headers
-		 >=sys-kernel/linux-headers-2.6.33
+		 >=sys-kernel/linux-headers-2.6.32
 		 ${DEPEND}"
 
 src_compile() {
@@ -26,5 +26,6 @@ src_compile() {
 }
 
 src_install() {
+	# Their Makefile doesn't support DESTDIR, they call it DEST_DIR.
 	emake DEST_DIR="${D}" install || die "emake failed"
 }
