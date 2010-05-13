@@ -83,4 +83,10 @@ src_unpack() {
 	[[ ${CTARGET} == *-softfloat-* ]] && epatch "${FILESDIR}"/4.4.0/gcc-4.4.0-softfloat.patch
 
 	epatch "${FILESDIR}"/PR43698-fix.patch
+
+	EXTRA_ECONF="$(use_enable lto) ${EXTRA_ECONF} --enable-checking=release"
+	if [[ ${CTARGET} == *-neon-* ]] ; then
+		EXTRA_ECONF="${EXTRA_ECONF} --with-arch=armv7-a --with-fpu=neon --with-float=hard"
+	fi
+
 }
