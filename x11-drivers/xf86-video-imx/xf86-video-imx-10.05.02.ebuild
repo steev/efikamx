@@ -12,7 +12,7 @@ SRC_URI="http://ubersekret.com/distfiles/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS=""
+KEYWORDS="~arm"
 IUSE=""
 
 RDEPEND="x11-base/xorg-server
@@ -27,12 +27,12 @@ DEPEND="${RDEPEND}
 
 PATCHES=( "${FILESDIR}/${P}-xorg-abi-fix.patch"
 	"${FILESDIR}/${P}-remove-Symbols.patch"
-	"${FILESDIR}/${P}-update-exa-2.4-2.5.patch"
-	"${FILESDIR}/${P}-fix-macro-dir.patch" )
+	"${FILESDIR}/${P}-unbundle-exa.patch"
+	"${FILESDIR}/${P}-use-dixChangeGC.patch"
+	"${FILESDIR}/${PN}-0.1.0-fix-macro-dir.patch" )
 
 # And we override the xorg2 eclass to make the m4 directory that doesn't exist.
 src_prepare() {
-	xorg-2_src_unpack
 	mkdir -p ${S}/m4
 	xorg-2_patch_source
 	xorg-2_reconf_source
