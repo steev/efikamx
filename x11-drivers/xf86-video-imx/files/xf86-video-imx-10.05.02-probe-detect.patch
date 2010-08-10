@@ -1,0 +1,14 @@
+diff -urN xf86-video-imx-10.07.11.orig/src/imx_drv.c xf86-video-imx-10.07.11/src/imx_drv.c
+--- xf86-video-imx-10.07.11.orig/src/imx_drv.c	2010-08-09 22:13:57.000000000 +0000
++++ xf86-video-imx-10.07.11/src/imx_drv.c	2010-08-09 22:24:37.000000000 +0000
+@@ -241,10 +241,6 @@
+ 
+ 	TRACE("probe start");
+ 
+-	/* For now, just bail out for PROBE_DETECT. */
+-	if (flags & PROBE_DETECT)
+-		return FALSE;
+-
+ 	if ((numDevSections = xf86MatchDevice(IMX_DRIVER_NAME, &devSections)) <= 0) 
+ 	    return FALSE;
+ 	
