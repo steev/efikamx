@@ -29,8 +29,8 @@ PATCHES=( "${FILESDIR}/${PN}-10.05.02-xorg-abi-fix.patch"
 	"${FILESDIR}/${PN}-10.05.02-remove-Symbols.patch"
 	"${FILESDIR}/${PN}-10.05.02-unbundle-exa.patch"
 	"${FILESDIR}/${P}-missing-exa-symbol.patch"
-	"${FILESDIR}/${P}-use-dixLookupResourceByType.diff"
 	"${FILESDIR}/${PN}-10.05.02-use-dixChangeGC.patch"
+	"${FILESDIR}/${P}-use-dixLookupResourceByType.diff"
 	"${FILESDIR}/${PN}-0.1.0-fix-macro-dir.patch" )
 
 # And we override the xorg2 eclass to make the m4 directory that doesn't exist.

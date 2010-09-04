@@ -5,8 +5,8 @@ diff -urN xf86-video-imx-10.07.11/src/imx_ext.c xf86-video-imx-10.07.11.orig/src
  
  	/* Find the pixmap */
  	PixmapPtr pPixmap;
--	int rc = dixLookupResourceByType((pointer*)&pPixmap, stuff->pixmap, RT_PIXMAP, client,
-+	int rc = dixLookupResource((pointer*)&pPixmap, stuff->pixmap, RT_PIXMAP, client,
++	int rc = dixLookupResourceByType((pointer*)&pPixmap, stuff->pixmap, RT_PIXMAP, client,
+-	int rc = dixLookupResource((pointer*)&pPixmap, stuff->pixmap, RT_PIXMAP, client,
  					DixGetAttrAccess);
  	if (Success == rc)
  	{
