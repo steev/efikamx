@@ -1,0 +1,582 @@
+diff -ruN gstreamer0.10-0.10.25/docs/gst/gstreamer-sections.txt gstreamer0.10-0.10.25.modified/docs/gst/gstreamer-sections.txt
+--- gstreamer0.10-0.10.25/docs/gst/gstreamer-sections.txt	2009-10-05 19:38:31.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/docs/gst/gstreamer-sections.txt	2010-04-26 10:17:21.000000000 +0800
+@@ -210,6 +210,49 @@
+ </SECTION>
+ 
+ <SECTION>
++<FILE>gstmfwbuffer</FILE>
++<TITLE>GstMfwBuffer</TITLE>
++
++
++GST_MFWBUFFER_IS_DMABLE
++GST_MFWBUFFER_SET_DMABLE
++
++GST_MFWBUFFER_FLAGS
++GST_MFWBUFFER_PHYADDRESS
++GST_MFWBUFFER_VIRTADDRESS
++GST_MFWBUFFER_DEF_FINALIZE
++GST_MFWBUFFER_PRIVOBJ
++GST_MFWBUFFER_UID
++
++GST_GSTMFWBUFFER_SET_FINALIZE_CALLBACK
++
++GST_MFWBUFFER_TRACE_NAME
++
++GstMfwBuffer
++GstMfwBufferFlag
++gst_mfw_buffer_make_readonly
++gst_mfw_buffer_new
++gst_mfw_buffer_new_and_alloc
++mfw_buf_finalize_func
++
++<SUBSECTION Standard>
++GstMfwBufferClass
++GST_MFWBUFFER
++GST_MFWBUFFER_CLASS
++GST_MFWBUFFER_GET_CLASS
++GST_IS_MFWBUFFER
++GST_IS_MFWBUFFER_CLASS
++GST_TYPE_MFWBUFFER
++GST_TYPE_MFW_BUFFER_FLAG
++GST_MFWBUFFER_CAST
++<SUBSECTION Private>
++gst_mfw_buffer_flag_get_type
++gst_mfw_buffer_get_type
++</SECTION>
++
++
++
++<SECTION>
+ <FILE>gstbufferlist</FILE>
+ <TITLE>GstBufferList</TITLE>
+ GstBufferList
+diff -ruN gstreamer0.10-0.10.25/gst/gst.c gstreamer0.10-0.10.25.modified/gst/gst.c
+--- gstreamer0.10-0.10.25/gst/gst.c	2009-09-11 23:34:42.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/gst/gst.c	2010-04-26 10:17:21.000000000 +0800
+@@ -1087,6 +1087,7 @@
+   gst_caps_get_type ();
+   _gst_event_initialize ();
+   _gst_buffer_initialize ();
++  _gst_mfw_buffer_initialize (); 
+   _gst_buffer_list_initialize ();
+   _gst_message_initialize ();
+   _gst_tag_initialize ();
+diff -ruN gstreamer0.10-0.10.25/gst/gst.h gstreamer0.10-0.10.25.modified/gst/gst.h
+--- gstreamer0.10-0.10.25/gst/gst.h	2009-07-14 17:54:05.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/gst/gst.h	2010-04-26 10:17:21.000000000 +0800
+@@ -33,6 +33,7 @@
+ 
+ #include <gst/gstbin.h>
+ #include <gst/gstbuffer.h>
++#include <gst/gstmfwbuffer.h>
+ #include <gst/gstbufferlist.h>
+ #include <gst/gstcaps.h>
+ #include <gst/gstchildproxy.h>
+diff -ruN gstreamer0.10-0.10.25/gst/gstinfo.c gstreamer0.10-0.10.25.modified/gst/gstinfo.c
+--- gstreamer0.10-0.10.25/gst/gstinfo.c	2009-07-14 17:54:05.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/gst/gstinfo.c	2010-04-26 10:17:21.000000000 +0800
+@@ -141,6 +141,7 @@
+ GstDebugCategory *GST_CAT_SCHEDULING = NULL;
+ 
+ GstDebugCategory *GST_CAT_BUFFER = NULL;
++GstDebugCategory *GST_CAT_MFWBUFFER = NULL;
+ GstDebugCategory *GST_CAT_BUFFER_LIST = NULL;
+ GstDebugCategory *GST_CAT_BUS = NULL;
+ GstDebugCategory *GST_CAT_CAPS = NULL;
+@@ -349,6 +350,8 @@
+       GST_DEBUG_BOLD | GST_DEBUG_FG_MAGENTA, NULL);
+   GST_CAT_BUFFER = _gst_debug_category_new ("GST_BUFFER",
+       GST_DEBUG_BOLD | GST_DEBUG_BG_GREEN, NULL);
++  GST_CAT_MFWBUFFER = _gst_debug_category_new ("GST_MFWBUFFER",
++      GST_DEBUG_BOLD | GST_DEBUG_BG_GREEN, NULL);
+   GST_CAT_BUFFER_LIST = _gst_debug_category_new ("GST_BUFFER_LIST",
+       GST_DEBUG_BOLD | GST_DEBUG_BG_GREEN, NULL);
+   GST_CAT_BUS = _gst_debug_category_new ("GST_BUS", GST_DEBUG_BG_YELLOW, NULL);
+diff -ruN gstreamer0.10-0.10.25/gst/gstmfwbuffer.c gstreamer0.10-0.10.25.modified/gst/gstmfwbuffer.c
+--- gstreamer0.10-0.10.25/gst/gstmfwbuffer.c	1970-01-01 08:00:00.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/gst/gstmfwbuffer.c	2010-04-26 10:17:21.000000000 +0800
+@@ -0,0 +1,222 @@
++/*
++ * Copyright (C) 2010 Freescale Semiconductor, Inc. All rights reserved.
++ *
++ */
++
++/*
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Library General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Library General Public License for more details.
++ *
++ * You should have received a copy of the GNU Library General Public
++ * License along with this library; if not, write to the
++ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
++ * Boston, MA 02111-1307, USA.
++ */
++ 
++/*
++ * Module Name:    gstmfwbuffer.c
++ *
++ * Description:    Implementation of Freescale accelerated hardware buffer
++ *                 for gstreamer.
++ *
++ * Portability:    This code is written for Linux OS and Gstreamer
++ */  
++ 
++/*
++ * Changelog: 
++ *
++ */
++#include <stdio.h>
++#include <stdlib.h>
++#include <dlfcn.h>
++
++#include "gst_private.h"
++
++#include "gstbuffer.h"
++#include "gstinfo.h"
++#include "gstutils.h"
++#include "gstminiobject.h"
++#include "gstmfwbuffer.h"
++
++typedef void * (* new_hwbuf_func)(int, void **, void **, int flags);
++typedef void (* free_hwbuf_func)(void *);
++
++static new_hwbuf_func g_new_hwbuf_handle = NULL;
++static free_hwbuf_func g_free_hwbuf_handle = NULL;
++static void * g_dlhandle = NULL;
++
++
++static void gst_mfw_buffer_finalize (GstMfwBuffer * buffer);
++static GType _gst_mfw_buffer_type = 0;
++
++void open_allocator_dll()
++{
++    char * errstr;
++    g_dlhandle = dlopen("libmfwba.so", RTLD_LAZY);
++    
++    if (!g_dlhandle) {
++        GST_CAT_ERROR(GST_CAT_MFWBUFFER, "Can not open dll, %s.\n", dlerror());
++        goto error;
++    }
++    
++    dlerror();
++    g_new_hwbuf_handle = dlsym(g_dlhandle, "mfw_new_hw_buffer");
++    if ((errstr = dlerror()) != NULL)  {
++        GST_CAT_ERROR(GST_CAT_MFWBUFFER, "Can load symbl for mfw_new_hw_buffer, %s\n", errstr);
++        goto error;
++    }
++    
++    dlerror();
++    g_free_hwbuf_handle = dlsym(g_dlhandle, "mfw_free_hw_buffer");
++    if ((errstr = dlerror()) != NULL)  {
++        GST_CAT_ERROR(GST_CAT_MFWBUFFER, "Can load symbl for mfw_free_hw_buffer, %s\n", errstr);
++        goto error;
++    }
++
++    return;
++
++error:
++    if (g_dlhandle){
++        dlclose(g_dlhandle);
++        g_dlhandle=NULL;
++    }
++    g_new_hwbuf_handle = NULL;
++    g_free_hwbuf_handle = NULL;
++    
++}
++
++void
++_gst_mfw_buffer_initialize (void)
++{
++  /* the GstMiniObject types need to be class_ref'd once before it can be
++   * done from multiple threads;
++   * see http://bugzilla.gnome.org/show_bug.cgi?id=304551 */
++  g_type_class_ref (gst_mfw_buffer_get_type ());
++  open_allocator_dll();
++}
++
++#define _do_init \
++{ \
++  _gst_mfw_buffer_type = g_define_type_id; \
++}
++
++G_DEFINE_TYPE_WITH_CODE (GstMfwBuffer, gst_mfw_buffer, GST_TYPE_BUFFER, _do_init);
++
++static void
++gst_mfw_buffer_class_init (GstMfwBufferClass * klass)
++{
++  klass->gstbuf_class.mini_object_class.finalize =
++      (GstMiniObjectFinalizeFunction) gst_mfw_buffer_finalize;
++}
++
++static void
++gst_mfw_buffer_finalize (GstMfwBuffer * buffer)
++{
++    g_return_if_fail (buffer != NULL);
++
++    GST_CAT_LOG (GST_CAT_MFWBUFFER, "finalize %p", buffer);
++
++    /* custom finalize callback */
++    if (G_UNLIKELY (buffer->def_finalize))
++        (*buffer->def_finalize)(buffer);
++
++    /* actually free all resource when refcont not added finalize function */
++    if (GST_MINI_OBJECT_REFCOUNT(buffer)==0){
++        if (buffer->alloc_obj){
++            if (buffer->flags&GST_MFW_BUFFER_FLAG_DMABLE){
++                (*g_free_hwbuf_handle)(buffer->alloc_obj);
++            }else{
++                g_free(buffer->alloc_obj);
++            }
++            buffer->alloc_obj = NULL;
++        }
++        buffer->flags=0;
++    }
++}
++
++static void
++gst_mfw_buffer_init (GstMfwBuffer * buffer)
++{
++  GST_CAT_LOG (GST_CAT_MFWBUFFER, "init %p", buffer);
++
++  buffer->phy_addr = NULL;
++  buffer->virt_addr = NULL;
++  buffer->alloc_obj = NULL;
++  buffer->priv = NULL;
++  buffer->def_finalize = NULL;
++  buffer->flags = 0;
++  buffer->uid = -1;
++}
++
++GstMfwBuffer *
++gst_mfw_buffer_new (void)
++{
++  GstMfwBuffer *newbuf;
++
++  newbuf = (GstMfwBuffer *) gst_mini_object_new (_gst_mfw_buffer_type);
++
++  GST_CAT_LOG (GST_CAT_MFWBUFFER, "new %p", newbuf);
++
++  return newbuf;
++}
++
++GstMfwBuffer *
++gst_mfw_buffer_new_and_alloc (guint size, guint flags )
++{
++    GstMfwBuffer *newbuf = NULL;
++
++    if ((newbuf = gst_mfw_buffer_new())==NULL){
++        GST_CAT_ERROR(GST_CAT_MFWBUFFER, "Can not new gst_mfw_buffer\n");
++        goto error;
++    }
++
++    if (flags&GST_MFW_BUFFER_FLAG_DMABLE){
++        if (g_new_hwbuf_handle){
++            newbuf->alloc_obj = 
++                (*g_new_hwbuf_handle)(size, &newbuf->phy_addr, &newbuf->virt_addr, 0);
++        }
++        if ((newbuf->alloc_obj==NULL) && (flags&GST_MFW_BUFFER_FLAG_DMABLE_MANDATORY)){
++            GST_CAT_ERROR(GST_CAT_MFWBUFFER, "Can not create mandatory hwbuf size %d\n", size);
++            goto error;
++        }
++
++        if (newbuf->alloc_obj)
++            newbuf->flags |= GST_MFW_BUFFER_FLAG_DMABLE;
++    }
++
++    if (newbuf->alloc_obj==NULL){
++        newbuf->alloc_obj = g_malloc(size);
++        if (newbuf->alloc_obj==NULL){
++            GST_CAT_ERROR(GST_CAT_MFWBUFFER, "Can not create sw buf size %d\n", size);
++            goto error;
++        }
++        newbuf->virt_addr = newbuf->alloc_obj;
++    }
++
++    GST_BUFFER_SIZE(newbuf) = size;
++    GST_BUFFER_DATA(newbuf) = newbuf->virt_addr;
++
++    return newbuf;
++
++error:
++    if (newbuf){
++        gst_mini_object_unref(GST_MINI_OBJECT_CAST(newbuf));
++        newbuf = NULL;    
++    }
++    return newbuf;
++}
++
++void gst_mfw_buffer_make_readonly(GstMfwBuffer * buffer)
++{
++    g_return_if_fail (buffer != NULL);
++    
++    GST_MINI_OBJECT_FLAG_SET(buffer, GST_MINI_OBJECT_FLAG_READONLY);
++}
++
+diff -ruN gstreamer0.10-0.10.25/gst/gstmfwbuffer.h gstreamer0.10-0.10.25.modified/gst/gstmfwbuffer.h
+--- gstreamer0.10-0.10.25/gst/gstmfwbuffer.h	1970-01-01 08:00:00.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/gst/gstmfwbuffer.h	2010-04-26 10:21:09.000000000 +0800
+@@ -0,0 +1,121 @@
++/*
++ * Copyright (C) 2010 Freescale Semiconductor, Inc. All rights reserved.
++ *
++ */
++
++/*
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Library General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Library General Public License for more details.
++ *
++ * You should have received a copy of the GNU Library General Public
++ * License along with this library; if not, write to the
++ * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
++ * Boston, MA 02111-1307, USA.
++ */
++
++/*
++ * Module Name:    gstmfwbuffer.h
++ *
++ * Description:    Head file of Freescale accelerated hardware buffer
++ *                 for gstreamer.
++ *
++ * Portability:    This code is written for Linux OS and Gstreamer
++ */  
++ 
++/*
++ * Changelog: 
++ *
++ */
++#ifndef __GST_MFW_BUFFER_H__
++#define __GST_MFW_BUFFER_H__
++
++#include <gst/gstminiobject.h>
++#include <gst/gstbuffer.h>
++
++G_BEGIN_DECLS
++
++typedef struct _GstMfwBuffer GstMfwBuffer;
++typedef struct _GstMfwBufferClass GstMfwBufferClass;
++
++
++
++
++
++#define GST_MFWBUFFER_TRACE_NAME           "GstMfwBuffer"
++
++#define GST_TYPE_MFWBUFFER                         (gst_mfw_buffer_get_type())
++#define GST_IS_MFWBUFFER(obj)                      (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GST_TYPE_MFWBUFFER))
++#define GST_IS_MFWBUFFER_CLASS(klass)                    (G_TYPE_CHECK_CLASS_TYPE ((klass), GST_TYPE_MFWBUFFER))
++#define GST_MFWBUFFER_GET_CLASS(obj)               (G_TYPE_INSTANCE_GET_CLASS ((obj), GST_TYPE_MFWBUFFER, GstMfwBufferClass))
++#define GST_MFWBUFFER(obj)                         (G_TYPE_CHECK_INSTANCE_CAST ((obj), GST_TYPE_MFWBUFFER, GstMfwBuffer))
++#define GST_MFWBUFFER_CLASS(klass)                 (G_TYPE_CHECK_CLASS_CAST ((klass), GST_TYPE_MFWBUFFER, GstMfwBufferClass))
++#define GST_MFWBUFFER_CAST(obj)                    ((GstMfwBuffer *)(obj))
++
++
++
++typedef enum {
++    GST_MFW_BUFFER_FLAG_DMABLE = (1<<0),
++    GST_MFW_BUFFER_FLAG_DMABLE_MANDATORY  =  (1<<1),
++} GstMfwBufferFlag;
++
++#define GST_MFWBUFFER_IS_DMABLE(buf)  (GST_MFWBUFFER_CAST(buf)->flags & GST_MFW_BUFFER_FLAG_DMABLE)
++#define GST_MFWBUFFER_SET_DMABLE(buf)  \
++    do{\
++        GST_MFWBUFFER_CAST(buf)->flags |= GST_MFW_BUFFER_FLAG_DMABLE;\
++    }while(0)
++
++#define GST_MFWBUFFER_FLAGS(buf) (GST_MFWBUFFER_CAST(buf)->flags)
++#define GST_MFWBUFFER_PHYADDRESS(buf) (GST_MFWBUFFER_CAST(buf)->phy_addr)
++#define GST_MFWBUFFER_VIRTADDRESS(buf) (GST_MFWBUFFER_CAST(buf)->virt_addr)
++#define GST_MFWBUFFER_DEF_FINALIZE(buf) (GST_MFWBUFFER_CAST(buf)->def_finalize)
++#define GST_MFWBUFFER_PRIVOBJ(buf)			(GST_MFWBUFFER_CAST(buf)->priv)
++#define GST_MFWBUFFER_UID(buf)			(GST_MFWBUFFER_CAST(buf)->uid)
++
++
++
++
++
++#define GST_GSTMFWBUFFER_SET_FINALIZE_CALLBACK(buf, callback, args)\
++    do{\
++        GST_BUFFER_CAST(buf)->def_finalize=(callback);\
++    }while(0)
++
++
++typedef void (*mfw_buf_finalize_func) (GstMfwBuffer *);
++
++
++struct _GstMfwBuffer {
++    GstBuffer gst_buf;
++    gint uid; /* uniformed id, default -1 */
++    guint flags;
++    void * virt_addr;
++    void * phy_addr;
++    void * alloc_obj; /* same as virtaddr when sw buffer, hwbuf desc when hw buffer */
++    void * priv; /* caller defined priv */
++    mfw_buf_finalize_func def_finalize;
++};
++
++struct _GstMfwBufferClass {
++  GstBufferClass gstbuf_class;
++};
++
++GType       gst_mfw_buffer_get_type (void);
++
++/* allocation */
++GstMfwBuffer * gst_mfw_buffer_new               (void);
++GstMfwBuffer * gst_mfw_buffer_new_and_alloc     (guint size, guint flags);
++
++void gst_mfw_buffer_make_readonly(GstMfwBuffer * buffer);
++
++
++G_END_DECLS
++
++#endif /* __GstMfwBuffer_H__ */
++
+diff -ruN gstreamer0.10-0.10.25/gst/gst_private.h gstreamer0.10-0.10.25.modified/gst/gst_private.h
+--- gstreamer0.10-0.10.25/gst/gst_private.h	2009-07-14 17:54:05.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/gst/gst_private.h	2010-04-26 10:17:21.000000000 +0800
+@@ -87,6 +87,7 @@
+  * headers, so at least the symbols need to continue to be available unless
+  * we want enterprise edition packagers dancing on our heads) */
+ void  _gst_buffer_initialize (void);
++void  _gst_mfw_buffer_initialize (void);
+ void  _gst_buffer_list_initialize (void);
+ void  _gst_event_initialize (void);
+ void  _gst_format_initialize (void);
+@@ -128,6 +129,7 @@
+ GST_EXPORT GstDebugCategory *GST_CAT_STATES;
+ GST_EXPORT GstDebugCategory *GST_CAT_SCHEDULING;
+ GST_EXPORT GstDebugCategory *GST_CAT_BUFFER;
++GST_EXPORT GstDebugCategory *GST_CAT_MFWBUFFER;
+ GST_EXPORT GstDebugCategory *GST_CAT_BUFFER_LIST;
+ GST_EXPORT GstDebugCategory *GST_CAT_BUS;
+ GST_EXPORT GstDebugCategory *GST_CAT_CAPS;
+@@ -163,6 +165,7 @@
+ #define GST_CAT_SCHEDULING       NULL
+ #define GST_CAT_DATAFLOW         NULL
+ #define GST_CAT_BUFFER           NULL
++#define GST_CAT_MFWBUFFER        NULL
+ #define GST_CAT_BUFFER_LIST      NULL
+ #define GST_CAT_BUS              NULL
+ #define GST_CAT_CAPS             NULL
+diff -ruN gstreamer0.10-0.10.25/gst/Makefile.am gstreamer0.10-0.10.25.modified/gst/Makefile.am
+--- gstreamer0.10-0.10.25/gst/Makefile.am	2009-09-17 05:00:08.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/gst/Makefile.am	2010-04-26 10:17:21.000000000 +0800
+@@ -56,6 +56,7 @@
+ 	gstobject.c		\
+ 	gstbin.c		\
+ 	gstbuffer.c		\
++	gstmfwbuffer.c		\
+ 	gstbufferlist.c		\
+ 	gstbus.c		\
+ 	gstcaps.c		\
+@@ -143,6 +144,7 @@
+ 	gstobject.h		\
+ 	gstbin.h		\
+ 	gstbuffer.h		\
++	gstmfwbuffer.h		\
+ 	gstbufferlist.h		\
+ 	gstbus.h		\
+ 	gstcaps.h		\
+diff -ruN gstreamer0.10-0.10.25/gst/Makefile.in gstreamer0.10-0.10.25.modified/gst/Makefile.in
+--- gstreamer0.10-0.10.25/gst/Makefile.in	2009-10-05 19:04:48.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/gst/Makefile.in	2010-04-26 10:17:21.000000000 +0800
+@@ -104,18 +104,18 @@
+ 	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2) \
+ 	$(am__DEPENDENCIES_2)
+ am__libgstreamer_@GST_MAJORMINOR@_la_SOURCES_DIST = gst.c gstobject.c \
+-	gstbin.c gstbuffer.c gstbufferlist.c gstbus.c gstcaps.c \
+-	gstchildproxy.c gstclock.c gstdebugutils.c gstelement.c \
+-	gstelementfactory.c gsterror.c gstevent.c gstfilter.c \
+-	gstformat.c gstghostpad.c gstindex.c gstindexfactory.c \
+-	gstinfo.c gstinterface.c gstiterator.c gstmessage.c \
+-	gstminiobject.c gstpad.c gstpadtemplate.c gstparamspecs.c \
+-	gstpipeline.c gstplugin.c gstpluginfeature.c gstpoll.c \
+-	gstpreset.c gstquark.c gstquery.c gstregistry.c gstsegment.c \
+-	gststructure.c gstsystemclock.c gsttaglist.c gsttagsetter.c \
+-	gsttask.c gsttaskpool.c gsttrace.c gsttypefind.c \
+-	gsttypefindfactory.c gsturi.c gstutils.c gstvalue.c gstparse.c \
+-	gstregistrybinary.c gstxml.c
++	gstbin.c gstbuffer.c gstmfwbuffer.c gstbufferlist.c gstbus.c \
++	gstcaps.c gstchildproxy.c gstclock.c gstdebugutils.c \
++	gstelement.c gstelementfactory.c gsterror.c gstevent.c \
++	gstfilter.c gstformat.c gstghostpad.c gstindex.c \
++	gstindexfactory.c gstinfo.c gstinterface.c gstiterator.c \
++	gstmessage.c gstminiobject.c gstpad.c gstpadtemplate.c \
++	gstparamspecs.c gstpipeline.c gstplugin.c gstpluginfeature.c \
++	gstpoll.c gstpreset.c gstquark.c gstquery.c gstregistry.c \
++	gstsegment.c gststructure.c gstsystemclock.c gsttaglist.c \
++	gsttagsetter.c gsttask.c gsttaskpool.c gsttrace.c \
++	gsttypefind.c gsttypefindfactory.c gsturi.c gstutils.c \
++	gstvalue.c gstparse.c gstregistrybinary.c gstxml.c
+ @GST_DISABLE_TRACE_FALSE@am__objects_1 = libgstreamer_@GST_MAJORMINOR@_la-gsttrace.lo
+ @GST_DISABLE_REGISTRY_FALSE@am__objects_2 = libgstreamer_@GST_MAJORMINOR@_la-gstregistrybinary.lo
+ @GST_DISABLE_LOADSAVE_FALSE@am__objects_3 = libgstreamer_@GST_MAJORMINOR@_la-gstxml.lo
+@@ -124,6 +124,7 @@
+ 	libgstreamer_@GST_MAJORMINOR@_la-gstobject.lo \
+ 	libgstreamer_@GST_MAJORMINOR@_la-gstbin.lo \
+ 	libgstreamer_@GST_MAJORMINOR@_la-gstbuffer.lo \
++	libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.lo \
+ 	libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.lo \
+ 	libgstreamer_@GST_MAJORMINOR@_la-gstbus.lo \
+ 	libgstreamer_@GST_MAJORMINOR@_la-gstcaps.lo \
+@@ -511,6 +512,7 @@
+ 	gstobject.c		\
+ 	gstbin.c		\
+ 	gstbuffer.c		\
++	gstmfwbuffer.c		\
+ 	gstbufferlist.c		\
+ 	gstbus.c		\
+ 	gstcaps.c		\
+@@ -600,6 +602,7 @@
+ 	gstobject.h		\
+ 	gstbin.h		\
+ 	gstbuffer.h		\
++	gstmfwbuffer.h		\
+ 	gstbufferlist.h		\
+ 	gstbus.h		\
+ 	gstcaps.h		\
+@@ -798,6 +801,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstutils.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstvalue.Plo@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstxml.Plo@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.Plo@am__quote@
+ 
+ .c.o:
+ @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@@ -848,6 +852,12 @@
+ @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+ @am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstreamer_@GST_MAJORMINOR@_la_CFLAGS) $(CFLAGS) -c -o libgstreamer_@GST_MAJORMINOR@_la-gstbuffer.lo `test -f 'gstbuffer.c' || echo '$(srcdir)/'`gstbuffer.c
+ 
++libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.lo: gstmfwbuffer.c
++@am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstreamer_@GST_MAJORMINOR@_la_CFLAGS) $(CFLAGS) -MT libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.lo -MD -MP -MF $(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.Tpo -c -o libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.lo `test -f 'gstmfwbuffer.c' || echo '$(srcdir)/'`gstmfwbuffer.c
++@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.Tpo $(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.Plo
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='gstmfwbuffer.c' object='libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.lo' libtool=yes @AMDEPBACKSLASH@
++@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
++@am__fastdepCC_FALSE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstreamer_@GST_MAJORMINOR@_la_CFLAGS) $(CFLAGS) -c -o libgstreamer_@GST_MAJORMINOR@_la-gstmfwbuffer.lo `test -f 'gstmfwbuffer.c' || echo '$(srcdir)/'`gstmfwbuffer.c
+ libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.lo: gstbufferlist.c
+ @am__fastdepCC_TRUE@	$(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstreamer_@GST_MAJORMINOR@_la_CFLAGS) $(CFLAGS) -MT libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.lo -MD -MP -MF $(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.Tpo -c -o libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.lo `test -f 'gstbufferlist.c' || echo '$(srcdir)/'`gstbufferlist.c
+ @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.Tpo $(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.Plo
+diff -ruN gstreamer0.10-0.10.25/win32/common/libgstreamer.def gstreamer0.10-0.10.25.modified/win32/common/libgstreamer.def
+--- gstreamer0.10-0.10.25/win32/common/libgstreamer.def	2009-09-11 23:34:43.000000000 +0800
++++ gstreamer0.10-0.10.25.modified/win32/common/libgstreamer.def	2010-04-26 10:17:21.000000000 +0800
+@@ -2,6 +2,7 @@
+ 	GST_CAT_AUTOPLUG DATA
+ 	GST_CAT_AUTOPLUG_ATTEMPT DATA
+ 	GST_CAT_BUFFER DATA
++	GST_CAT_MFWBUFFER DATA
+ 	GST_CAT_BUFFER_LIST DATA
+ 	GST_CAT_BUS DATA
+ 	GST_CAT_CALL_TRACE DATA
