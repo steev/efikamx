@@ -33,5 +33,5 @@ src_install() {
 	insinto /usr/lib
 	doins "${S}/usr/lib/libz160-amd.so"
 	doins "${S}/usr/lib/libz160-fsl.so"
-	dosym /usr/lib/libz160-fsl.so /usr/lib/libz160.so
+	dosym libz160-fsl.so /usr/lib/libz160.so
 }
