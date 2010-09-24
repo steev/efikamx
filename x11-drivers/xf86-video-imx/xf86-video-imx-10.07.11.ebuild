@@ -8,7 +8,7 @@ inherit xorg-2
 
 DESCRIPTION="xf86 imx driver"
 HOMEPAGE=""
-SRC_URI="http://ubersekret.com/distfiles/${P}.tar.bz2"
+SRC_URI="xserver-xorg-video-imx-${PV}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
@@ -24,6 +24,8 @@ DEPEND="${RDEPEND}
 	x11-proto/videoproto
 	x11-proto/xproto
 	>=sys-libs/imx-lib-${PV}"
+
+S="${WORKDIR}/xserver-xorg-video-imx-${PV}"
 
 PATCHES=( "${FILESDIR}/${PN}-10.05.02-xorg-abi-fix.patch"
 	"${FILESDIR}/${PN}-10.05.02-remove-Symbols.patch"
