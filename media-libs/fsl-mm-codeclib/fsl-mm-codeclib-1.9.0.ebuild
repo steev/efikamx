@@ -152,10 +152,4 @@ src_install() {
 	doins "${S}"/ghdr/wma10_dec/*
 	insinto /usr/lib
 	doins "${S}"/release/lib/*
-	# Okay, now that we have everything in place, lets dump the 0byte files.
-	rm ${D}/usr/lib/lib_g.723.1_{dec,enc}_arm11_elinux.so
-	rm ${D}/usr/lib/lib_wb_amr_{dec,enc}_arm11_elinux.so
-	rm ${D}/usr/lib/lib_jpeg_enc_arm9_elinux.so
-	rm ${D}/usr/lib/lib_nb_amr_{dec,enc}_arm11_elinux.so
-	rm ${D}/usr/lib/lib_gif_dec_arm9_elinux.so
 }
