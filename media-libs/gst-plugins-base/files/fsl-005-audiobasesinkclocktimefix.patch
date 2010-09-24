@@ -1,0 +1,27 @@
+diff -ruN gst-plugins-base0.10-0.10.25.orig/gst-libs/gst/audio/gstbaseaudiosink.c gst-plugins-base0.10-0.10.25/gst-libs/gst/audio/gstbaseaudiosink.c
+--- gst-plugins-base0.10-0.10.25.orig/gst-libs/gst/audio/gstbaseaudiosink.c	2009-12-09 15:08:23.000000000 +0800
++++ gst-plugins-base0.10-0.10.25/gst-libs/gst/audio/gstbaseaudiosink.c	2009-12-09 15:10:29.000000000 +0800
+@@ -465,9 +465,13 @@
+   guint64 raw, samples;
+   guint delay;
+   GstClockTime result;
++  
++  GST_OBJECT_LOCK(sink);
+ 
+-  if (sink->ringbuffer == NULL || sink->ringbuffer->spec.rate == 0)
++  if (sink->ringbuffer == NULL || sink->ringbuffer->spec.rate == 0){
++    GST_OBJECT_UNLOCK(sink);  
+     return GST_CLOCK_TIME_NONE;
++  }
+ 
+   /* our processed samples are always increasing */
+   raw = samples = gst_ring_buffer_samples_done (sink->ringbuffer);
+@@ -483,6 +487,8 @@
+ 
+   result = gst_util_uint64_scale_int (samples, GST_SECOND,
+       sink->ringbuffer->spec.rate);
++ 
++  GST_OBJECT_UNLOCK(sink);
+ 
+   GST_DEBUG_OBJECT (sink,
+       "processed samples: raw %" G_GUINT64_FORMAT ", delay %u, real %"

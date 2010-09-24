@@ -1,0 +1,12 @@
+diff -Nur gst-plugins-base-0.10.22/gst/typefind/gsttypefindfunctions.c gst-plugins-base-0.10.22_typefind_aacplus2flac/gst/typefind/gsttypefindfunctions.c
+--- gst-plugins-base-0.10.22/gst/typefind/gsttypefindfunctions.c	2009-01-06 07:24:01.000000000 +0800
++++ gst-plugins-base-0.10.22_typefind_aacplus2flac/gst/typefind/gsttypefindfunctions.c	2009-06-10 18:08:09.000000000 +0800
+@@ -3329,7 +3329,7 @@
+       NULL, CMML_CAPS, NULL, NULL);
+   TYPE_FIND_REGISTER_START_WITH (plugin, "application/x-executable",
+       GST_RANK_MARGINAL, NULL, "\177ELF", 4, GST_TYPE_FIND_MAXIMUM);
+-  TYPE_FIND_REGISTER (plugin, "adts_mpeg_stream", GST_RANK_SECONDARY,
++  TYPE_FIND_REGISTER (plugin, "adts_mpeg_stream", GST_RANK_PRIMARY,
+       aac_type_find, aac_exts, AAC_CAPS, NULL, NULL);
+   TYPE_FIND_REGISTER_START_WITH (plugin, "audio/x-spc", GST_RANK_SECONDARY,
+       spc_exts, "SNES-SPC700 Sound File Data", 27, GST_TYPE_FIND_MAXIMUM);

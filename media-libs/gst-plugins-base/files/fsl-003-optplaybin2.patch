@@ -1,0 +1,17 @@
+diff -ruN gst-plugins-base0.10-0.10.25/gst/playback/gstplaybin2.c gst-plugins-base0.10-0.10.25.step3/gst/playback/gstplaybin2.c
+--- gst-plugins-base0.10-0.10.25/gst/playback/gstplaybin2.c	2009-11-10 19:31:26.000000000 +0800
++++ gst-plugins-base0.10-0.10.25.step3/gst/playback/gstplaybin2.c	2009-11-10 19:39:26.000000000 +0800
+@@ -1105,7 +1105,13 @@
+   /* add sink */
+   playbin->playsink = g_object_new (GST_TYPE_PLAY_SINK, NULL);
+   gst_bin_add (GST_BIN_CAST (playbin), GST_ELEMENT_CAST (playbin->playsink));
++  /* Fslmm: Do not connect csc and video scaler */
++#if 1
++  gst_play_sink_set_flags (playbin->playsink, DEFAULT_FLAGS|GST_PLAY_FLAG_NATIVE_VIDEO);
++#else
+   gst_play_sink_set_flags (playbin->playsink, DEFAULT_FLAGS);
++#endif  
++  /* Fslmm: End */
+ 
+   playbin->encoding = g_strdup (DEFAULT_SUBTITLE_ENCODING);
+ 

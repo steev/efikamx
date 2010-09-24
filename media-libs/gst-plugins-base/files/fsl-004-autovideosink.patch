@@ -1,0 +1,12 @@
+diff -ruN gst-plugins-base-0.10.22-autovideosink/gst/playback/gstplaybin.c gst-plugins-base-0.10.22/gst/playback/gstplaybin.c
+--- gst-plugins-base-0.10.22-autovideosink/gst/playback/gstplaybin.c	2009-11-26 15:56:08.000000000 +0800
++++ gst-plugins-base-0.10.22/gst/playback/gstplaybin.c	2009-11-26 15:51:10.000000000 +0800
+@@ -824,7 +824,7 @@
+   if (play_bin->video_sink) {
+     sink = play_bin->video_sink;
+   } else {
+-#if 0  
++#if 1  
+     sink = gst_element_factory_make ("autovideosink", "videosink");
+ 
+ #else

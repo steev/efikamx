@@ -1,0 +1,173 @@
+diff -ruN gst-plugins-base0.10-0.10.25.orig/gst/playback/gstdecodebin.c gst-plugins-base0.10-0.10.25/gst/playback/gstdecodebin.c
+--- gst-plugins-base0.10-0.10.25.orig/gst/playback/gstdecodebin.c	2009-12-09 15:00:34.000000000 +0800
++++ gst-plugins-base0.10-0.10.25/gst/playback/gstdecodebin.c	2009-12-09 15:01:28.000000000 +0800
+@@ -816,7 +816,7 @@
+ 
+   g_object_set (G_OBJECT (queue), "max-size-buffers", 0, NULL);
+   g_object_set (G_OBJECT (queue), "max-size-time", G_GINT64_CONSTANT (0), NULL);
+-  g_object_set (G_OBJECT (queue), "max-size-bytes", 8192, NULL);
++  g_object_set (G_OBJECT (queue), "max-size-bytes", 10*1024*1024, NULL);
+   gst_bin_add (GST_BIN (decode_bin), queue);
+   gst_element_set_state (queue, GST_STATE_READY);
+   queuesinkpad = gst_element_get_static_pad (queue, "sink");
+@@ -1091,7 +1091,7 @@
+     g_object_set (G_OBJECT (queue), "max-size-buffers", 0, NULL);
+     g_object_set (G_OBJECT (queue), "max-size-time", G_GINT64_CONSTANT (0),
+         NULL);
+-    g_object_set (G_OBJECT (queue), "max-size-bytes", 8192, NULL);
++    g_object_set (G_OBJECT (queue), "max-size-bytes", 10*1024*1024, NULL);//8192, NULL);
+     gst_bin_add (GST_BIN (decode_bin), queue);
+     gst_element_set_state (queue, GST_STATE_READY);
+     queuesinkpad = gst_element_get_static_pad (queue, "sink");
+diff -ruN gst-plugins-base0.10-0.10.25.orig/gst/playback/gstplaybasebin.c gst-plugins-base0.10-0.10.25/gst/playback/gstplaybasebin.c
+--- gst-plugins-base0.10-0.10.25.orig/gst/playback/gstplaybasebin.c	2009-12-09 15:00:34.000000000 +0800
++++ gst-plugins-base0.10-0.10.25/gst/playback/gstplaybasebin.c	2009-12-09 15:04:37.000000000 +0800
+@@ -826,6 +826,8 @@
+    * after the source that measures the datarate and scales this
+    * queue of encoded data instead.
+    */
++#if 0
++  
+   if (play_base_bin->raw_decoding_mode) {
+     if (type == GST_STREAM_TYPE_VIDEO) {
+       g_object_set (G_OBJECT (preroll),
+@@ -842,6 +844,12 @@
+         ((type == GST_STREAM_TYPE_VIDEO) ? 25 : 2) * 1024 * 1024,
+         "max-size-time", play_base_bin->queue_size, NULL);
+   }
++#else
++  if (type == GST_STREAM_TYPE_VIDEO)
++     g_object_set (G_OBJECT (preroll),"max-size-buffers", 3, "max-size-bytes", 0, "max-size-time", G_GINT64_CONSTANT (0), NULL);
++  else
++     g_object_set (G_OBJECT (preroll),"max-size-buffers", 1*1024*1024,"max-size-time", play_base_bin->queue_size, NULL);
++#endif
+ 
+   /* the overrun signal is always attached and serves two purposes:
+    *
+diff -ruN gst-plugins-base0.10-0.10.25.orig/gst/playback/gstplaybin.c gst-plugins-base0.10-0.10.25/gst/playback/gstplaybin.c
+--- gst-plugins-base0.10-0.10.25.orig/gst/playback/gstplaybin.c	2009-12-09 15:00:34.000000000 +0800
++++ gst-plugins-base0.10-0.10.25/gst/playback/gstplaybin.c	2009-12-09 15:01:28.000000000 +0800
+@@ -831,7 +831,14 @@
+   if (play_bin->video_sink) {
+     sink = play_bin->video_sink;
+   } else {
++#if 0  
+     sink = gst_element_factory_make ("autovideosink", "videosink");
++
++#else
++    sink = gst_element_factory_make ("mfw_v4lsink", "videosink");
++    play_bin->video_sink = sink;
++
++#endif
+     if (sink == NULL) {
+       sink = gst_element_factory_make ("xvimagesink", "videosink");
+     }
+@@ -846,6 +853,7 @@
+   element = gst_bin_new ("vbin");
+   gst_bin_add (GST_BIN_CAST (element), sink);
+ 
++#if 0 /* Disable the CSC and VideoScale */
+   conv = gst_element_factory_make ("ffmpegcolorspace", "vconv");
+   if (conv == NULL)
+     goto no_colorspace;
+@@ -855,20 +863,28 @@
+   if (scale == NULL)
+     goto no_videoscale;
+   gst_bin_add (GST_BIN_CAST (element), scale);
++#endif
+ 
+   identity = gst_element_factory_make ("identity", "id");
+   g_object_set (identity, "silent", TRUE, NULL);
+   g_signal_connect (identity, "handoff", G_CALLBACK (handoff), play_bin);
+   gst_bin_add (GST_BIN_CAST (element), identity);
+ 
++#if 0
+   gst_element_link_pads (identity, "src", conv, "sink");
+   gst_element_link_pads (conv, "src", scale, "sink");
+   /* be more careful with the pad from the custom sink element, it might not
+    * be named 'sink' */
+   if (!gst_element_link_pads (scale, "src", sink, NULL))
+     goto link_failed;
++#else
++  gst_element_link_pads (identity, "src", sink, "sink");
++
++#endif
+ 
+   pad = gst_element_get_static_pad (identity, "sink");
++
++
+   gst_element_add_pad (element, gst_ghost_pad_new ("sink", pad));
+   gst_object_unref (pad);
+ 
+@@ -1097,7 +1113,12 @@
+   if (play_bin->audio_sink) {
+     sink = play_bin->audio_sink;
+   } else {
++#if 0
+     sink = gst_element_factory_make ("autoaudiosink", "audiosink");
++#else
++
++    sink = gst_element_factory_make ("alsasink", "audiosink");
++#endif
+     if (sink == NULL) {
+       sink = gst_element_factory_make ("alsasink", "audiosink");
+     }
+@@ -1112,7 +1133,7 @@
+ 
+   element = gst_bin_new ("abin");
+   gst_bin_add (GST_BIN_CAST (element), sink);
+-
++#if 0
+   conv = gst_element_factory_make ("audioconvert", "aconv");
+   if (conv == NULL)
+     goto no_audioconvert;
+@@ -1137,6 +1158,49 @@
+     goto link_failed;
+ 
+   pad = gst_element_get_static_pad (conv, "sink");
++#else
++{
++  GstElement *capsfilter;
++  GstCaps *audiocaps = NULL;
++
++  conv = gst_element_factory_make ("audioconvert", "aconv");
++  if (conv == NULL)
++    goto no_audioconvert;
++  gst_bin_add (GST_BIN_CAST (element), conv);
++
++  /* Add capsfilter to only support 2 channel output */
++  audiocaps = gst_caps_new_simple("audio/x-raw-int",
++  			    "channels", G_TYPE_INT, 2, NULL);
++
++  capsfilter = gst_element_factory_make ("capsfilter", "audio-caps");
++  if ( capsfilter == NULL)
++  {
++    GST_ELEMENT_ERROR (play_bin, CORE, MISSING_PLUGIN,
++        (_("Missing element '%s' - check your GStreamer installation."),
++            "capsfilter"), ("Do not know the root cause."));
++    goto link_failed;
++
++  }
++  g_object_set(G_OBJECT(capsfilter), "caps", audiocaps, NULL);
++  gst_caps_unref(audiocaps);
++
++  gst_bin_add (GST_BIN_CAST (element), capsfilter);
++
++  volume = gst_element_factory_make ("volume", "volume");
++  g_object_set (G_OBJECT (volume), "volume", play_bin->volume, NULL);
++  play_bin->volume_element = volume;
++  gst_bin_add (GST_BIN_CAST (element), volume);
++
++  res = gst_element_link_pads (conv, "src", capsfilter, "sink");
++  res &= gst_element_link_pads (capsfilter, "src", volume, "sink");
++  res &= gst_element_link_pads (volume, "src", sink, NULL);
++  if (!res)
++    goto link_failed;
++
++  pad = gst_element_get_pad (conv, "sink");
++}
++
++#endif
+   gst_element_add_pad (element, gst_ghost_pad_new ("sink", pad));
+   gst_object_unref (pad);
+ 

@@ -1,0 +1,47 @@
+diff -Nur gst-plugins-base-0.10.22/gst/playback/gstplaybasebin.c gst-plugins-base-0.10.22_mpeg2_avsyncfix/gst/playback/gstplaybasebin.c
+--- gst-plugins-base-0.10.22/gst/playback/gstplaybasebin.c	2008-10-11 07:22:49.000000000 +0800
++++ gst-plugins-base-0.10.22_mpeg2_avsyncfix/gst/playback/gstplaybasebin.c	2009-06-04 16:08:22.452306800 +0800
+@@ -904,7 +904,21 @@
+   gst_bin_add (target, selector);
+   gst_bin_add (target, preroll);
+ 
++// Fixed the bug of ENGR00112498 & ENGR00112504. Two places should be changed.
++// This is the first place to change.
++// The second place locates in setup_sinks() of gstplaybin.c
++#if 0
+   gst_element_link (selector, preroll);
++#else
++if(type==GST_STREAM_TYPE_VIDEO)
++{
++  //gst_element_link (selector, preroll);
++}
++else
++{
++  gst_element_link (selector, preroll);
++}
++#endif
+ 
+   /* figure out target state and set */
+   state = (GST_STATE (play_base_bin) == GST_STATE_PLAYING ?
+diff -Nur gst-plugins-base-0.10.22/gst/playback/gstplaybin.c gst-plugins-base-0.10.22_mpeg2_avsyncfix/gst/playback/gstplaybin.c
+--- gst-plugins-base-0.10.22/gst/playback/gstplaybin.c	2009-01-06 07:24:01.000000000 +0800
++++ gst-plugins-base-0.10.22_mpeg2_avsyncfix/gst/playback/gstplaybin.c	2009-06-04 16:09:39.155431800 +0800
+@@ -1684,9 +1684,18 @@
+   beach:
+     if (!sink)
+       return FALSE;
++// Fixed the bug of ENGR00112498 & ENGR00112504. Two places should be changed.
++// This is the second place to change.
++// The first place locates in gen_preroll_element() of gstplaybasebin.c
++#if 0 //original
+     pad =
+         gst_element_get_static_pad (group->type[GST_STREAM_TYPE_VIDEO -
+             1].preroll, "src");
++#else
++    pad =
++        gst_element_get_static_pad (group->type[GST_STREAM_TYPE_VIDEO -
++            1].selector, "src");
++#endif
+     res = add_sink (play_bin, sink, pad, textsrcpad);
+     gst_object_unref (pad);
+     if (textsrcpad)
