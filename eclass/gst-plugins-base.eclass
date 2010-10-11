@@ -94,22 +94,22 @@ gst-plugins-base_src_prepare() {
 
 	# Link with the syswide installed gst-libs if needed
 	gst-plugins10_find_plugin_dir
-	sed -e "s:\$(top_builddir)/gst-libs/gst/interfaces/libgstinterfaces-\$(GST_MAJORMINOR).la::" \
-		-e "s:\${top_builddir}/gst-libs/gst/interfaces/libgstinterfaces-\$(GST_MAJORMINOR).la::" \
-		-e "s:\$(top_builddir)/gst-libs/gst/audio/libgstaudio-\$(GST_MAJORMINOR).la::" \
-		-e "s:\${top_builddir}/gst-libs/gst/audio/libgstaudio-\$(GST_MAJORMINOR).la::" \
-		-e "s:\$(top_builddir)/gst-libs/gst/cdda/libgstcdda-\$(GST_MAJORMINOR).la::" \
-		-e "s:\${top_builddir}/gst-libs/gst/cdda/libgstcdda-\$(GST_MAJORMINOR).la::" \
-		-e "s:\$(top_builddir)/gst-libs/gst/riff/libgstriff-\$(GST_MAJORMINOR).la::" \
-		-e "s:\${top_builddir}/gst-libs/gst/riff/libgstriff-\$(GST_MAJORMINOR).la::" \
-		-e "s:\$(top_builddir)/gst-libs/gst/tag/libgsttag-\$(GST_MAJORMINOR).la::" \
-		-e "s:\${top_builddir}/gst-libs/gst/tag/libgsttag-\$(GST_MAJORMINOR).la::" \
-		-e "s:\$(top_builddir)/gst-libs/gst/video/libgstvideo-\$(GST_MAJORMINOR).la::" \
-		-e "s:\${top_builddir}/gst-libs/gst/video/libgstvideo-\$(GST_MAJORMINOR).la::" \
-		-e "s:\$(top_builddir)/gst-libs/gst/netbuffer/libgstnetbuffer-\$(GST_MAJORMINOR).la::" \
-		-e "s:\${top_builddir}/gst-libs/gst/netbuffer/libgstnetbuffer-\$(GST_MAJORMINOR).la::" \
-		-e "s:\$(top_builddir)/gst-libs/gst/rtp/libgstrtp-\$(GST_MAJORMINOR).la::" \
-		-e "s:\${top_builddir}/gst-libs/gst/rtp/libgstrtp-\$(GST_MAJORMINOR).la::" \
+	sed -e "s:\$(top_builddir)/gst-libs/gst/interfaces/libgstinterfaces-\$(GST_MAJORMINOR).la:-lgstinterfaces-\$(GST_MAJORMINOR):" \
+		-e "s:\${top_builddir}/gst-libs/gst/interfaces/libgstinterfaces-\$(GST_MAJORMINOR).la:-lgstinterfaces-\$(GST_MAJORMINOR):" \
+		-e "s:\$(top_builddir)/gst-libs/gst/audio/libgstaudio-\$(GST_MAJORMINOR).la:-lgstaudio-\$(GST_MAJORMINOR):" \
+		-e "s:\${top_builddir}/gst-libs/gst/audio/libgstaudio-\$(GST_MAJORMINOR).la:-lgstaudio-\$(GST_MAJORMINOR):" \
+		-e "s:\$(top_builddir)/gst-libs/gst/cdda/libgstcdda-\$(GST_MAJORMINOR).la:-lgstcdda-\$(GST_MAJORMINOR):" \
+		-e "s:\${top_builddir}/gst-libs/gst/cdda/libgstcdda-\$(GST_MAJORMINOR).la:-lgstcdda-\$(GST_MAJORMINOR):" \
+		-e "s:\$(top_builddir)/gst-libs/gst/riff/libgstriff-\$(GST_MAJORMINOR).la:-lgstriff-\$(GST_MAJORMINOR):" \
+		-e "s:\${top_builddir}/gst-libs/gst/riff/libgstriff-\$(GST_MAJORMINOR).la:-lgstriff-\$(GST_MAJORMINOR):" \
+		-e "s:\$(top_builddir)/gst-libs/gst/tag/libgsttag-\$(GST_MAJORMINOR).la:-lgsttag-\$(GST_MAJORMINOR):" \
+		-e "s:\${top_builddir}/gst-libs/gst/tag/libgsttag-\$(GST_MAJORMINOR).la:-lgsttag-\$(GST_MAJORMINOR):" \
+		-e "s:\$(top_builddir)/gst-libs/gst/video/libgstvideo-\$(GST_MAJORMINOR).la:-lgstvideo-\$(GST_MAJORMINOR):" \
+		-e "s:\${top_builddir}/gst-libs/gst/video/libgstvideo-\$(GST_MAJORMINOR).la:-lgstvideo-\$(GST_MAJORMINOR):" \
+		-e "s:\$(top_builddir)/gst-libs/gst/netbuffer/libgstnetbuffer-\$(GST_MAJORMINOR).la:-lgstnetbuffer-\$(GST_MAJORMINOR):" \
+		-e "s:\${top_builddir}/gst-libs/gst/netbuffer/libgstnetbuffer-\$(GST_MAJORMINOR).la:-lgstnerbuffer-\$(GST_MAJORMINOR):" \
+		-e "s:\$(top_builddir)/gst-libs/gst/rtp/libgstrtp-\$(GST_MAJORMINOR).la:-lgstrtp-\$(GST_MAJORMINOR):" \
+		-e "s:\${top_builddir}/gst-libs/gst/rtp/libgstrtp-\$(GST_MAJORMINOR).la:-lgstrtp-\$(GST_MAJORMINOR):" \
 		-i Makefile.in
 #	cd ${S}
 
