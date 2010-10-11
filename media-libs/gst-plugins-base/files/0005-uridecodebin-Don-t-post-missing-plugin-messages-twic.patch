@@ -1,0 +1,40 @@
+From 5ee4ee1682cff7ca44897fec0dcee6374cd6636d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian.droege@collabora.co.uk>
+Date: Thu, 24 Sep 2009 14:56:48 +0200
+Subject: [PATCH 5/7] uridecodebin: Don't post missing plugin messages twice
+
+decodebin2 already posts them after emitting the unknown-type signal,
+there's no need to post another one.
+---
+ gst/playback/gsturidecodebin.c |    6 ------
+ 1 files changed, 0 insertions(+), 6 deletions(-)
+
+diff --git a/gst/playback/gsturidecodebin.c b/gst/playback/gsturidecodebin.c
+index 0e0bb74..6420414 100644
+--- a/gst/playback/gsturidecodebin.c
++++ b/gst/playback/gsturidecodebin.c
+@@ -33,8 +33,6 @@
+ #include <gst/gst.h>
+ #include <gst/gst-i18n-plugin.h>
+ 
+-#include <gst/pbutils/missing-plugins.h>
+-
+ #include "gstfactorylists.h"
+ #include "gstplay-marshal.h"
+ #include "gstplay-enum.h"
+@@ -622,12 +620,8 @@ static void
+ unknown_type_cb (GstElement * element, GstPad * pad, GstCaps * caps,
+     GstURIDecodeBin * decoder)
+ {
+-  GstMessage *msg;
+   gchar *capsstr;
+ 
+-  msg = gst_missing_decoder_message_new (GST_ELEMENT_CAST (decoder), caps);
+-  gst_element_post_message (GST_ELEMENT_CAST (decoder), msg);
+-
+   capsstr = gst_caps_to_string (caps);
+   GST_ELEMENT_WARNING (decoder, CORE, MISSING_PLUGIN,
+       (_("No decoder available for type \'%s\'."), capsstr), (NULL));
+-- 
+1.6.4.3
+

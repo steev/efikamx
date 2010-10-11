@@ -1,0 +1,18 @@
+diff --git a/gst/playback/gstplaybin2.c b/gst/playback/gstplaybin2.c
+index 13a9090..1f8dc0a 100644
+--- a/gst/playback/gstplaybin2.c
++++ b/gst/playback/gstplaybin2.c
+@@ -1157,7 +1157,13 @@ gst_play_bin_init (GstPlayBin * playbin)
+   /* add sink */
+   playbin->playsink = g_object_new (GST_TYPE_PLAY_SINK, NULL);
+   gst_bin_add (GST_BIN_CAST (playbin), GST_ELEMENT_CAST (playbin->playsink));
++  /* Fslmm: Do not connect csc and video scaler */
++#if 1
++  gst_play_sink_set_flags (playbin->playsink, DEFAULT_FLAGS|GST_PLAY_FLAG_NATIVE_VIDEO);
++#else
+   gst_play_sink_set_flags (playbin->playsink, DEFAULT_FLAGS);
++#endif
++  /* Fslmm: End */
+   /* Connect to notify::volume and notify::mute signals for proxying */
+   g_signal_connect (playbin->playsink, "notify::volume",
+       G_CALLBACK (notify_volume_cb), playbin);

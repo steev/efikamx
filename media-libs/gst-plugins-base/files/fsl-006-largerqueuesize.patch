@@ -1,20 +1,21 @@
---- ./gst-plugins-base-0.10.25/gst/playback/gstdecodebin2.c.orig	2010-09-24 15:13:03.368898667 +0300
-+++ ./gst-plugins-base-0.10.25/gst/playback/gstdecodebin2.c	2010-09-24 15:13:19.368899330 +0300
-@@ -1824,7 +1824,7 @@
-      * memory. When this queue overruns, we assume the group is complete and can
-      * be exposed. */
-     g_object_set (G_OBJECT (mq),
--        "max-size-bytes", (guint) 2 * 1024 * 1024,
-+        "max-size-bytes", (guint) 10 * 1024 * 1024,
-         "max-size-time", (guint64) 0, "max-size-buffers", (guint) 0, NULL);
-     /* will expose the group */
-     group->overrunsig = g_signal_connect (G_OBJECT (mq), "overrun",
-@@ -2181,7 +2181,7 @@
-     /* update runtime limits. At runtime, we try to keep the amount of buffers
-      * in the queues as low as possible (but at least 5 buffers). */
-     g_object_set (G_OBJECT (group->multiqueue),
--        "max-size-bytes", 2 * 1024 * 1024, "max-size-buffers", 5, NULL);
-+        "max-size-bytes", 10 * 1024 * 1024, "max-size-buffers", 5, NULL);
-     /* we can now disconnect any overrun signal, which is used to expose the
-      * group. */
-     if (group->overrunsig) {
+diff -ruN gst-plugins-base0.10-0.10.25-2ubuntu1.1.orig/gst/playback/gstdecodebin2.c gst-plugins-base0.10-0.10.25-2ubuntu1.1/gst/playback/gstdecodebin2.c
+--- gst-plugins-base0.10-0.10.25-2ubuntu1.1.orig/gst/playback/gstdecodebin2.c	2009-12-10 13:23:07.000000000 +0800
++++ gst-plugins-base0.10-0.10.25-2ubuntu1.1/gst/playback/gstdecodebin2.c	2009-12-10 13:29:27.000000000 +0800
+@@ -2084,7 +2084,7 @@
+   }
+ 
+   g_object_set (G_OBJECT (mq),
+-      "max-size-bytes", (guint) 2 * 1024 * 1024,
++      "max-size-bytes", (guint) 10 * 1024 * 1024,
+       "max-size-time", (guint64) 0, "max-size-buffers", (guint) 0, NULL);
+ 
+   group->overrunsig = g_signal_connect (G_OBJECT (mq), "overrun",
+@@ -2563,7 +2563,7 @@
+   /* update runtime limits. At runtime, we try to keep the amount of buffers
+    * in the queues as low as possible (but at least 5 buffers). */
+   g_object_set (G_OBJECT (group->multiqueue),
+-      "max-size-bytes", 2 * 1024 * 1024, "max-size-buffers", 5, NULL);
++      "max-size-bytes", 10 * 1024 * 1024, "max-size-buffers", 0, NULL);
+   /* we can now disconnect any overrun signal, which is used to expose the
+    * group. */
+   if (group->overrunsig) {

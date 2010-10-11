@@ -1,0 +1,65 @@
+From 881e4aa606ac184e4da485a88066ff30e88fc5cd Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian.droege@collabora.co.uk>
+Date: Sat, 26 Sep 2009 12:04:55 +0200
+Subject: [PATCH 1/7] decodebin2: Only use the object lock for protecting the subtitle elements
+
+Using the decodebin lock will result in deadlocks if the subtitle encoding
+is accessed from a pad-added handler.
+---
+ gst/playback/gstdecodebin2.c |   12 +++++-------
+ 1 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/gst/playback/gstdecodebin2.c b/gst/playback/gstdecodebin2.c
+index 3b60ae9..1ad7968 100644
+--- a/gst/playback/gstdecodebin2.c
++++ b/gst/playback/gstdecodebin2.c
+@@ -857,18 +857,16 @@ gst_decode_bin_set_subs_encoding (GstDecodeBin * dbin, const gchar * encoding)
+ 
+   GST_DEBUG_OBJECT (dbin, "Setting new encoding: %s", GST_STR_NULL (encoding));
+ 
+-  DECODE_BIN_LOCK (dbin);
+   GST_OBJECT_LOCK (dbin);
+   g_free (dbin->encoding);
+   dbin->encoding = g_strdup (encoding);
+-  GST_OBJECT_UNLOCK (dbin);
+ 
+   /* set the subtitle encoding on all added elements */
+   for (walk = dbin->subtitles; walk; walk = g_list_next (walk)) {
+     g_object_set (G_OBJECT (walk->data), "subtitle-encoding", dbin->encoding,
+         NULL);
+   }
+-  DECODE_BIN_UNLOCK (dbin);
++  GST_OBJECT_UNLOCK (dbin);
+ }
+ 
+ static gchar *
+@@ -1319,11 +1317,11 @@ connect_pad (GstDecodeBin * dbin, GstElement * src, GstDecodePad * dpad,
+       continue;
+     }
+     if (subtitle) {
+-      DECODE_BIN_LOCK (dbin);
++      GST_OBJECT_LOCK (dbin);
+       /* we added the element now, add it to the list of subtitle-encoding
+        * elements when we can set the property */
+       dbin->subtitles = g_list_prepend (dbin->subtitles, element);
+-      DECODE_BIN_UNLOCK (dbin);
++      GST_OBJECT_UNLOCK (dbin);
+     }
+ 
+     res = TRUE;
+@@ -2364,10 +2362,10 @@ restart:
+ 
+ done:
+   gst_element_set_state (element, GST_STATE_NULL);
+-  DECODE_BIN_LOCK (dbin);
++  GST_OBJECT_LOCK (dbin);
+   /* remove possible subtitle element */
+   dbin->subtitles = g_list_remove (dbin->subtitles, element);
+-  DECODE_BIN_UNLOCK (dbin);
++  GST_OBJECT_UNLOCK (dbin);
+   gst_bin_remove (GST_BIN (dbin), element);
+ 
+ beach:
+-- 
+1.6.4.3
+

@@ -1,0 +1,50 @@
+From 10cb19bcda3082435d57518666076a69e51a1bba Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Sebastian=20Dr=C3=B6ge?= <sebastian.droege@collabora.co.uk>
+Date: Thu, 24 Sep 2009 16:05:58 +0200
+Subject: [PATCH 3/7] factorylist: Use gst_caps_can_intersect() instead of _intersect()
+
+This is faster and results in less allocations.
+---
+ gst/playback/gstfactorylists.c |    9 +++------
+ 1 files changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/gst/playback/gstfactorylists.c b/gst/playback/gstfactorylists.c
+index 7099927..df1916f 100644
+--- a/gst/playback/gstfactorylists.c
++++ b/gst/playback/gstfactorylists.c
+@@ -240,7 +240,6 @@ gst_factory_list_filter (GValueArray * array, const GstCaps * caps)
+ 
+       /* we only care about the sink templates */
+       if (templ->direction == GST_PAD_SINK) {
+-        GstCaps *intersect;
+         GstCaps *tmpl_caps;
+ 
+         /* try to intersect the caps with the caps of the template */
+@@ -248,21 +247,19 @@ gst_factory_list_filter (GValueArray * array, const GstCaps * caps)
+ 
+         /* FIXME, intersect is not the right method, we ideally want to check
+          * for a subset here */
+-        intersect = gst_caps_intersect (caps, tmpl_caps);
+-        gst_caps_unref (tmpl_caps);
+ 
+         /* check if the intersection is empty */
+-        if (!gst_caps_is_empty (intersect)) {
++        if (gst_caps_can_intersect (caps, tmpl_caps)) {
+           /* non empty intersection, we can use this element */
+           GValue resval = { 0, };
+           g_value_init (&resval, G_TYPE_OBJECT);
+           g_value_set_object (&resval, factory);
+           g_value_array_append (result, &resval);
+           g_value_unset (&resval);
+-          gst_caps_unref (intersect);
++          gst_caps_unref (tmpl_caps);
+           break;
+         }
+-        gst_caps_unref (intersect);
++        gst_caps_unref (tmpl_caps);
+       }
+     }
+   }
+-- 
+1.6.4.3
+

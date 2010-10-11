@@ -1,0 +1,631 @@
+diff --git a/ext/pango/gsttextoverlay.c b/ext/pango/gsttextoverlay.c
+index 3e4a0ee..3edeca0 100644
+--- a/ext/pango/gsttextoverlay.c
++++ b/ext/pango/gsttextoverlay.c
+@@ -316,6 +316,11 @@ static void gst_text_overlay_get_property (GObject * object, guint prop_id,
+     GValue * value, GParamSpec * pspec);
+ static void gst_text_overlay_adjust_values_with_fontdesc (GstTextOverlay *
+     overlay, PangoFontDescription * desc);
++#ifdef MFW_SUBTITLE_IMPLEMENT
++static GstMfwBuffer *
++gst_text_overlay_render_pangocairo (GstTextOverlay * overlay,
++    const gchar * string, gint textlen);
++#endif
+ 
+ GST_BOILERPLATE (GstTextOverlay, gst_text_overlay, GstElement,
+     GST_TYPE_ELEMENT);
+@@ -348,6 +353,115 @@ gst_text_overlay_get_text (GstTextOverlay * overlay, GstBuffer * video_frame)
+ {
+   return g_strdup (overlay->default_text);
+ }
++#ifdef MFW_SUBTITLE_IMPLEMENT
++static GstSubtitleQueue * 
++gst_text_subtitle_queue_new(gint depth)
++{
++    GstSubtitleQueue * queue = g_malloc(sizeof(GstSubtitleQueue));
++    if (queue){
++        queue->head = queue->tail = NULL;
++        queue->cnt = 0;
++        queue->max = depth;
++    }
++    return queue;
++}
++
++static void
++gst_text_subtitle_queue_push_unlock(GstSubtitleQueue * queue, GstSubtitle * sub)
++{
++
++    
++
++
++
++    if (queue->head==NULL){
++        queue->head = queue->tail = sub;
++        queue->cnt++;
++    }else{
++        
++        queue->tail->next=sub;
++        queue->tail=sub;
++        queue->cnt++;
++        
++        
++    }
++
++}
++
++static void
++gst_text_subtitle_queue_flush_one(GstSubtitleQueue * queue)
++{
++    GstSubtitle * sub;
++    sub = queue->head;
++    if (sub->next==NULL){
++        queue->head = queue->tail = NULL;
++    }else{
++        queue->head=sub->next;
++    }
++    gst_buffer_unref(sub->buffer);
++    g_free(sub);
++    queue->cnt--;
++}
++
++static void
++gst_text_subtitle_queue_flush_all(GstSubtitleQueue * queue)
++{
++    GstSubtitle * sub, * subnext;
++    sub = queue->head;
++    while(sub){
++        subnext=sub->next;
++        gst_buffer_unref(sub->buffer);
++        g_free(sub);
++        sub=subnext;
++    }
++    queue->head = queue->tail = NULL;
++    queue->cnt = 0;
++}
++
++static void
++gst_text_subtitle_draw(GstTextOverlay * overlay, GstSubtitle * sub)
++{
++    GstMfwBuffer * imgbuf;
++    if (sub->type == GST_SUBTITLE_TYPE_IMAGE)
++        return;
++
++    if ((overlay->width)&&(overlay->height)){
++        char * text = GST_BUFFER_DATA(sub->buffer);
++        imgbuf = gst_text_overlay_render_pangocairo (overlay, text, strlen(text));
++        GST_BUFFER_TIMESTAMP(imgbuf) = GST_BUFFER_TIMESTAMP(sub->buffer);
++        GST_BUFFER_DURATION(imgbuf) = GST_BUFFER_DURATION(sub->buffer);
++        gst_buffer_unref(sub->buffer);
++        sub->buffer=imgbuf;
++        sub->type = GST_SUBTITLE_TYPE_IMAGE;
++        
++    }
++}
++
++static GstSubtitle *
++gst_text_subtitle_new_text(GstBuffer * buffer)
++{
++    GstSubtitle * sub = g_malloc(sizeof(GstSubtitle));
++    if (sub){
++        sub->next = NULL;
++        sub->type = GST_SUBTITLE_TYPE_TEXT;
++        sub->buffer = buffer;
++    }
++    return sub;
++}
++
++static GstFlowReturn
++gst_text_overlay_allocbuffer(GstPad * pad, 
++                              guint64 offset,
++                              guint size, GstCaps * caps,
++                              GstBuffer ** buf)
++{
++    GstTextOverlay * overlay = GST_TEXT_OVERLAY(GST_PAD_PARENT(pad));
++    return gst_pad_alloc_buffer(overlay->srcpad, offset,size,caps, buf);
++}
++
++
++#endif
++
+ 
+ static void
+ gst_text_overlay_class_init (GstTextOverlayClass * klass)
+@@ -480,21 +594,27 @@ gst_text_overlay_finalize (GObject * object)
+   GstTextOverlay *overlay = GST_TEXT_OVERLAY (object);
+ 
+   g_free (overlay->default_text);
+-
++#ifndef MFW_SUBTITLE_IMPLEMENT
+   if (overlay->text_image) {
+     g_free (overlay->text_image);
+     overlay->text_image = NULL;
+   }
+-
++#endif
+   if (overlay->layout) {
+     g_object_unref (overlay->layout);
+     overlay->layout = NULL;
+   }
+ 
++#ifndef MFW_SUBTITLE_IMPLEMENT
+   if (overlay->text_buffer) {
+     gst_buffer_unref (overlay->text_buffer);
+     overlay->text_buffer = NULL;
+   }
++#endif
++
++#ifdef MFW_SUBTITLE_IMPLEMENT
++  gst_text_subtitle_queue_flush_all(overlay->text_queue);
++#endif
+ 
+   if (overlay->cond) {
+     g_cond_free (overlay->cond);
+@@ -513,6 +633,11 @@ gst_text_overlay_init (GstTextOverlay * overlay, GstTextOverlayClass * klass)
+   /* video sink */
+   template = gst_static_pad_template_get (&video_sink_template_factory);
+   overlay->video_sinkpad = gst_pad_new_from_template (template, "video_sink");
++
++#ifdef MFW_SUBTITLE_IMPLEMENT
++  gst_pad_set_bufferalloc_function(overlay->video_sinkpad, gst_text_overlay_allocbuffer);
++#endif
++  
+   gst_object_unref (template);
+   gst_pad_set_getcaps_function (overlay->video_sinkpad,
+       GST_DEBUG_FUNCPTR (gst_text_overlay_getcaps));
+@@ -588,7 +713,12 @@ gst_text_overlay_init (GstTextOverlay * overlay, GstTextOverlayClass * klass)
+   overlay->fps_n = 0;
+   overlay->fps_d = 1;
+ 
++#ifndef MFW_SUBTITLE_IMPLEMENT
+   overlay->text_buffer = NULL;
++#else
++  overlay->text_queue = gst_text_subtitle_queue_new(TEXT_QUEUE_LENGTH);
++#endif
++
+   overlay->text_linked = FALSE;
+   overlay->cond = g_cond_new ();
+   gst_segment_init (&overlay->segment, GST_FORMAT_TIME);
+@@ -917,7 +1047,12 @@ gst_text_overlay_src_event (GstPad * pad, GstEvent * event)
+       GST_OBJECT_LOCK (overlay);
+       overlay->video_flushing = TRUE;
+       overlay->text_flushing = TRUE;
++#ifdef MFW_SUBTITLE_IMPLEMENT
++      gst_text_subtitle_queue_flush_all(overlay->text_queue);
++#else
+       gst_text_overlay_pop_text (overlay);
++#endif
++
+       GST_OBJECT_UNLOCK (overlay);
+ 
+       /* Seek on each sink pad */
+@@ -1151,7 +1286,41 @@ gst_text_overlay_blit_sub2x2cbcr (GstTextOverlay * overlay,
+   }
+ }
+ 
++
++#ifdef MFW_SUBTITLE_IMPLEMENT
++
++static GstMfwBuffer * 
++gst_text_overlay_new_textimg_buffer(GstTextOverlay * overlay, int width, int height)
++{
++    GstMfwBuffer * buffer;
++    SubDesc * subdesc;
++    int posx, posy;
++
++    posx = (overlay->width-width)/2;
++    posy = overlay->height-height;
++    int size = 4*width*height+sizeof(SubDesc);
++    
++    buffer = gst_mfw_buffer_new_and_alloc(size, 0);
++
++    subdesc = (SubDesc *)GST_BUFFER_DATA(buffer);
++    
++    overlay->text_image = subdesc->image;
++    subdesc->count = overlay->textimg_count++;
++    subdesc->width = width;
++    subdesc->height = height;
++    subdesc->posx = posx;
++    subdesc->posy = posy;
++
++    return buffer;
++}
++
++#endif
++
++#ifdef MFW_SUBTITLE_IMPLEMENT
++static GstMfwBuffer *
++#else
+ static void
++#endif
+ gst_text_overlay_render_pangocairo (GstTextOverlay * overlay,
+     const gchar * string, gint textlen)
+ {
+@@ -1161,6 +1330,9 @@ gst_text_overlay_render_pangocairo (GstTextOverlay * overlay,
+   cairo_matrix_t cairo_matrix;
+   int width, height;
+   double scalef = 1.0;
++#ifdef MFW_SUBTITLE_IMPLEMENT
++  GstMfwBuffer * imgbuf = NULL;
++#endif
+ 
+   if (overlay->auto_adjust_size) {
+     /* 640 pixel is default */
+@@ -1225,11 +1397,22 @@ gst_text_overlay_render_pangocairo (GstTextOverlay * overlay,
+     cairo_matrix_init_scale (&cairo_matrix, scalef, scalef);
+   }
+ 
++#ifndef MFW_SUBTITLE_IMPLEMENT
+   /* reallocate surface */
+   overlay->text_image = g_realloc (overlay->text_image, 4 * width * height);
+ 
+   surface = cairo_image_surface_create_for_data (overlay->text_image,
+       CAIRO_FORMAT_ARGB32, width, height, width * 4);
++#else
++  imgbuf = gst_text_overlay_new_textimg_buffer(overlay, width, height);
++  
++  
++  int timgsize = 4 * width * height;
++
++  surface = cairo_image_surface_create_for_data (GST_BUFFER_DATA(imgbuf)+sizeof(SubDesc),
++      CAIRO_FORMAT_ARGB32, width, height, width * 4);
++#endif
++
+   cr = cairo_create (surface);
+ 
+   /* clear surface */
+@@ -1282,6 +1465,9 @@ gst_text_overlay_render_pangocairo (GstTextOverlay * overlay,
+   overlay->image_width = width;
+   overlay->image_height = height;
+   overlay->baseline_y = ink_rect.y;
++#ifdef MFW_SUBTITLE_IMPLEMENT
++  return imgbuf;
++#endif
+ }
+ 
+ #define BOX_XPAD         6
+@@ -1875,6 +2061,8 @@ gst_text_overlay_video_bufferalloc (GstPad * pad, guint64 offset, guint size,
+ }
+ 
+ /* Called with lock held */
++
++#ifndef MFW_SUBTITLE_IMPLEMENT
+ static void
+ gst_text_overlay_pop_text (GstTextOverlay * overlay)
+ {
+@@ -1890,7 +2078,6 @@ gst_text_overlay_pop_text (GstTextOverlay * overlay)
+   /* Let the text task know we used that buffer */
+   GST_TEXT_OVERLAY_BROADCAST (overlay);
+ }
+-
+ /* We receive text buffers here. If they are out of segment we just ignore them.
+    If the buffer is in our segment we keep it internally except if another one
+    is already waiting here, in that case we wait that it gets kicked out */
+@@ -1978,6 +2165,149 @@ beach:
+   return ret;
+ }
+ 
++#else
++static void
++gst_text_overlay_pop_text (GstTextOverlay * overlay)
++{
++  g_return_if_fail (GST_IS_TEXT_OVERLAY (overlay));
++
++  GstBuffer * textbuffer = NULL;
++  if (overlay->text_queue->head){
++    textbuffer=overlay->text_queue->head->buffer;
++ }
++
++  if (textbuffer) {
++    /* update text_segment's last stop */
++    if (overlay->text_segment.format == GST_FORMAT_TIME &&
++        GST_BUFFER_TIMESTAMP_IS_VALID (textbuffer)) {
++      overlay->text_segment.last_stop =
++          GST_BUFFER_TIMESTAMP (textbuffer);
++      if (GST_BUFFER_DURATION_IS_VALID (textbuffer)) {
++        overlay->text_segment.last_stop +=
++            GST_BUFFER_DURATION (textbuffer);
++      }
++    }
++
++
++    gst_text_subtitle_queue_flush_one(overlay->text_queue);
++
++
++  }
++
++  /* Let the text task know we used that buffer */
++  GST_TEXT_OVERLAY_BROADCAST (overlay);
++}
++
++/* We receive text buffers here. If they are out of segment we just ignore them.
++   If the buffer is in our segment we keep it internally except if another one
++   is already waiting here, in that case we wait that it gets kicked out */
++static GstFlowReturn
++gst_text_overlay_text_chain (GstPad * pad, GstBuffer * buffer)
++{
++  GstFlowReturn ret = GST_FLOW_OK;
++  GstTextOverlay *overlay = NULL;
++  gboolean in_seg = FALSE;
++  gint64 clip_start = 0, clip_stop = 0;
++
++  overlay = GST_TEXT_OVERLAY (GST_PAD_PARENT (pad));
++
++  GST_OBJECT_LOCK (overlay);
++
++  if (overlay->text_flushing) {
++    GST_OBJECT_UNLOCK (overlay);
++    ret = GST_FLOW_WRONG_STATE;
++    GST_LOG_OBJECT (overlay, "text flushing");
++    goto beach;
++  }
++
++  if (overlay->text_eos) {
++    GST_OBJECT_UNLOCK (overlay);
++    ret = GST_FLOW_UNEXPECTED;
++    GST_LOG_OBJECT (overlay, "text EOS");
++    goto beach;
++  }
++
++  GST_LOG_OBJECT (overlay, "%" GST_SEGMENT_FORMAT "  BUFFER: ts=%"
++      GST_TIME_FORMAT ", end=%" GST_TIME_FORMAT, overlay->segment,
++      GST_TIME_ARGS (GST_BUFFER_TIMESTAMP (buffer)),
++      GST_TIME_ARGS (GST_BUFFER_TIMESTAMP (buffer) +
++          GST_BUFFER_DURATION (buffer)));
++
++  in_seg = gst_segment_clip (overlay->segment, GST_FORMAT_TIME,
++      GST_BUFFER_TIMESTAMP (buffer),
++      GST_BUFFER_TIMESTAMP (buffer) + GST_BUFFER_DURATION (buffer),
++      &clip_start, &clip_stop);
++
++  if (in_seg) {
++    GST_BUFFER_TIMESTAMP (buffer) = clip_start;
++    GST_BUFFER_DURATION (buffer) = clip_stop - clip_start;
++
++    GstSubtitle * sub = gst_text_subtitle_new_text(buffer);
++if (sub){
++    gst_text_subtitle_draw(overlay, sub);
++    GstSubtitleQueue * queue = overlay->text_queue;
++    while((queue->max)&&(queue->cnt>=queue->max)){
++        /* Wait for the previous buffer to go away */
++      GST_DEBUG ("Pad %s:%s has a buffer queued, waiting",
++          GST_DEBUG_PAD_NAME (pad));
++      GST_TEXT_OVERLAY_WAIT (overlay);
++      GST_DEBUG ("Pad %s:%s resuming", GST_DEBUG_PAD_NAME (pad));
++      if (overlay->text_flushing) {
++        gst_buffer_unref(sub->buffer);
++        g_free(sub);
++        GST_OBJECT_UNLOCK (overlay);
++        ret = GST_FLOW_WRONG_STATE;
++        goto beach;
++      }
++    }
++
++    gst_text_subtitle_queue_push_unlock(queue, sub);
++    /* in case the video chain is waiting for a text buffer, wake it up */
++    GST_TEXT_OVERLAY_BROADCAST (overlay);
++}else{
++    gst_buffer_unref(buffer);
++}
++  }
++
++  GST_OBJECT_UNLOCK (overlay);
++
++beach:
++
++  return ret;
++}
++
++
++
++void text_buffer_finalize (GstMfwBuffer * buffer){
++    GstBuffer * textbuf = GST_MFWBUFFER_PRIVOBJ(buffer);
++    if (textbuf){
++        gst_buffer_unref(textbuf);
++    }
++    GST_MFWBUFFER_PRIVOBJ(buffer) = NULL;
++}
++
++
++
++
++
++static void
++gst_text_overlay_bind_video_text(GstTextOverlay *overlay, GstMfwBuffer * videobuf)
++{
++    GstSubtitle * sub = overlay->text_queue->head;
++
++    if (sub->type==GST_SUBTITLE_TYPE_TEXT){
++        gst_text_subtitle_draw(overlay, sub);
++    }
++
++
++    if (sub->type==GST_SUBTITLE_TYPE_IMAGE){
++      if (GST_IS_MFWBUFFER(videobuf)){
++        gst_mfw_buffer_replace_sub_buffer(videobuf,sub->buffer);
++      }
++    }
++}
++#endif
++
+ static GstFlowReturn
+ gst_text_overlay_video_chain (GstPad * pad, GstBuffer * buffer)
+ {
+@@ -2080,14 +2410,32 @@ wait_for_text_buf:
+ 
+     if (text != NULL && *text != '\0') {
+       /* Render and push */
++#ifndef MFW_SUBTITLE_IMPLEMENT      
+       gst_text_overlay_render_text (overlay, text, -1);
+       ret = gst_text_overlay_push_frame (overlay, buffer);
++#else
++      gst_text_overlay_bind_video_text(overlay, buffer);
++      ret = gst_pad_push (overlay->srcpad, buffer);
++#endif      
+     } else {
+       /* Invalid or empty string */
++#ifdef MFW_SUBTITLE_IMPLEMENT
++      if (GST_IS_MFWBUFFER(buffer)){
++        gst_mfw_buffer_replace_sub_buffer(buffer,NULL);
++      }
++#endif      
+       ret = gst_pad_push (overlay->srcpad, buffer);
+     }
+   } else {
+     /* Text pad linked, check if we have a text buffer queued */
++#ifdef MFW_SUBTITLE_IMPLEMENT
++  
++  GstBuffer * textbuffer = NULL;
++  if (overlay->text_queue->head){
++    textbuffer=overlay->text_queue->head->buffer;
++ }
++    if (textbuffer) {
++#else    
+     if (overlay->text_buffer) {
+       gboolean pop_text = FALSE, valid_text_time = TRUE;
+       GstClockTime text_start = GST_CLOCK_TIME_NONE;
+@@ -2095,18 +2443,28 @@ wait_for_text_buf:
+       GstClockTime text_running_time = GST_CLOCK_TIME_NONE;
+       GstClockTime text_running_time_end = GST_CLOCK_TIME_NONE;
+       GstClockTime vid_running_time, vid_running_time_end;
+-
++#endif
+       /* if the text buffer isn't stamped right, pop it off the
+        * queue and display it for the current video frame only */
++#ifdef MFW_SUBTITLE_IMPLEMENT
++      if (!GST_BUFFER_TIMESTAMP_IS_VALID (textbuffer) ||
++          !GST_BUFFER_DURATION_IS_VALID (textbuffer)) {
++#else      
+       if (!GST_BUFFER_TIMESTAMP_IS_VALID (overlay->text_buffer) ||
+           !GST_BUFFER_DURATION_IS_VALID (overlay->text_buffer)) {
++#endif          
+         GST_WARNING_OBJECT (overlay,
+             "Got text buffer with invalid timestamp or duration");
+         pop_text = TRUE;
+         valid_text_time = FALSE;
+       } else {
++#ifdef MFW_SUBTITLE_IMPLEMENT
++        text_start = GST_BUFFER_TIMESTAMP (textbuffer);
++        text_end = text_start + GST_BUFFER_DURATION (textbuffer);
++#else      
+         text_start = GST_BUFFER_TIMESTAMP (overlay->text_buffer);
+         text_end = text_start + GST_BUFFER_DURATION (overlay->text_buffer);
++#endif        
+       }
+ 
+       vid_running_time =
+@@ -2144,12 +2502,19 @@ wait_for_text_buf:
+       } else if (valid_text_time && vid_running_time_end <= text_running_time) {
+         GST_LOG_OBJECT (overlay, "text in future, pushing video buf");
+         GST_OBJECT_UNLOCK (overlay);
++#ifdef MFW_SUBTITLE_IMPLEMENT
++      if (GST_IS_MFWBUFFER(buffer)){
++        gst_mfw_buffer_replace_sub_buffer(buffer,NULL);
++      }
++#endif
+         /* Push the video frame */
+         ret = gst_pad_push (overlay->srcpad, buffer);
+       } else {
+         gchar *in_text;
+         gsize in_size;
+ 
++
++#ifndef MFW_SUBTITLE_IMPLEMENT
+         in_text = (gchar *) GST_BUFFER_DATA (overlay->text_buffer);
+         in_size = GST_BUFFER_SIZE (overlay->text_buffer);
+ 
+@@ -2188,10 +2553,16 @@ wait_for_text_buf:
+ 
+         if (in_text != (gchar *) GST_BUFFER_DATA (overlay->text_buffer))
+           g_free (in_text);
+-
++#endif
+         GST_OBJECT_UNLOCK (overlay);
+-        ret = gst_text_overlay_push_frame (overlay, buffer);
+ 
++#ifdef MFW_SUBTITLE_IMPLEMENT
++
++        gst_text_overlay_bind_video_text(overlay, buffer);
++        ret = gst_pad_push (overlay->srcpad, buffer);
++#else        
++        ret = gst_text_overlay_push_frame (overlay, buffer);
++#endif
+         if (valid_text_time && text_running_time_end <= vid_running_time_end) {
+           GST_LOG_OBJECT (overlay, "text buffer not needed any longer");
+           pop_text = TRUE;
+@@ -2243,6 +2614,11 @@ wait_for_text_buf:
+       } else {
+         GST_OBJECT_UNLOCK (overlay);
+         GST_LOG_OBJECT (overlay, "no need to wait for a text buffer");
++#ifdef MFW_SUBTITLE_IMPLEMENT
++      if (GST_IS_MFWBUFFER(buffer)){
++        gst_mfw_buffer_replace_sub_buffer(buffer,NULL);
++      }
++#endif
+         ret = gst_pad_push (overlay->srcpad, buffer);
+       }
+     }
+diff --git a/ext/pango/gsttextoverlay.h b/ext/pango/gsttextoverlay.h
+index 4590b27..5bb27d7 100644
+--- a/ext/pango/gsttextoverlay.h
++++ b/ext/pango/gsttextoverlay.h
+@@ -6,6 +6,7 @@
+ #include <pango/pangocairo.h>
+ 
+ G_BEGIN_DECLS
++#define MFW_SUBTITLE_IMPLEMENT
+ 
+ #define GST_TYPE_TEXT_OVERLAY            (gst_text_overlay_get_type())
+ #define GST_TEXT_OVERLAY(obj)            (G_TYPE_CHECK_INSTANCE_CAST((obj),\
+@@ -80,6 +81,39 @@ typedef enum {
+     GST_TEXT_OVERLAY_LINE_ALIGN_RIGHT = PANGO_ALIGN_RIGHT
+ } GstTextOverlayLineAlign;
+ 
++#ifdef MFW_SUBTITLE_IMPLEMENT
++#define TEXT_QUEUE_LENGTH 6
++
++typedef enum {
++    GST_SUBTITLE_TYPE_NULL = 0,
++    GST_SUBTITLE_TYPE_TEXT,
++    GST_SUBTITLE_TYPE_IMAGE,
++} GstSubtitleType;
++
++
++typedef struct _GstSubtitle {
++    GstBuffer   *buffer;
++    GstSubtitleType type; 
++    struct _GstSubtitle * next;
++} GstSubtitle;
++
++typedef struct {
++  GstSubtitle * head;
++  GstSubtitle * tail;
++  gint max;
++  gint cnt;
++}GstSubtitleQueue;
++
++typedef struct {
++    int width;
++    int height;
++    int posx;
++    int posy;
++    unsigned long count;
++    char image[0];
++}SubDesc;
++#endif
++
+ /**
+  * GstTextOverlay:
+  *
+@@ -94,7 +128,12 @@ struct _GstTextOverlay {
+ 
+     GstSegment               segment;
+     GstSegment               text_segment;
++#ifdef MFW_SUBTITLE_IMPLEMENT
++    GstSubtitleQueue * text_queue;
++    gint textimg_count;
++#else
+     GstBuffer               *text_buffer;
++#endif
+     gboolean                text_linked;
+     gboolean                video_flushing;
+     gboolean                video_eos;

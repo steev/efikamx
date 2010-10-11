@@ -1,0 +1,20 @@
+diff --git a/gst/playback/gstdecodebin2.c b/gst/playback/gstdecodebin2.c
+index bc3c840..cb99db5 100644
+--- a/gst/playback/gstdecodebin2.c
++++ b/gst/playback/gstdecodebin2.c
+@@ -215,13 +215,13 @@ enum
+ 
+ /* automatic sizes, while prerolling we buffer up to 2MB, we ignore time
+  * and buffers in this case. */
+-#define AUTO_PREROLL_SIZE_BYTES     2 * 1024 * 1024
++#define AUTO_PREROLL_SIZE_BYTES     10 * 1024 * 1024
+ #define AUTO_PREROLL_SIZE_BUFFERS   0
+ #define AUTO_PREROLL_SIZE_TIME      0
+ 
+ /* whan playing, keep a max of 2MB of data but try to keep the number of buffers
+  * as low as possible (try to aim for 5 buffers) */
+-#define AUTO_PLAY_SIZE_BYTES        2 * 1024 * 1024
++#define AUTO_PLAY_SIZE_BYTES        10 * 1024 * 1024
+ #define AUTO_PLAY_SIZE_BUFFERS      5
+ #define AUTO_PLAY_SIZE_TIME         0
+ 
