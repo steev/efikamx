@@ -21,16 +21,15 @@ IUSE="+introspection nls test"
 RDEPEND=">=dev-libs/glib-2.20:2
 	dev-libs/libxml2
 	introspection? ( >=dev-libs/gobject-introspection-0.6.3 )
-	!<media-libs/gst-plugins-base-0.10.25"
+	!<media-libs/gst-plugins-base-0.10.26"
 	# ^^ queue2 move, mustn't have both libgstcoreleements.so and libgstqueue2.so at runtime providing the element at once
 DEPEND="${RDEPEND}
 	dev-util/pkgconfig
 	nls? ( sys-devel/gettext )"
 
 src_prepare() {
-	epatch "${FILESDIR}/01_multiqueue-iterate-internal-links.patch"
-	epatch "${FILESDIR}/fsl_001_gstreamer0.10-25_gstmfwbuffer.patch"
-	epatch "${FILESDIR}/fsl_002_gstreamer0.10-25_gstmfwbuffer_subbuffer.patch"
+	epatch "${FILESDIR}/fsl_001_gstreamer0.10-30_gstmfwbuffer.patch"
+	epatch "${FILESDIR}/fsl_002_gstreamer0.10-30_gstmfwbuffer_subbuffer.patch"
 }
 
 src_configure() {
