@@ -1,0 +1,14 @@
+--- ./ext/ffmpeg/gstffmpegdemux.c.orig	2010-04-19 13:35:46.716044223 +0200
++++ ./ext/ffmpeg/gstffmpegdemux.c	2010-04-19 13:36:08.616044961 +0200
+@@ -2215,9 +2215,9 @@
+         !strcmp (in_plugin->name, "4xm") ||
+         !strcmp (in_plugin->name, "yuv4mpegpipe") ||
+         !strcmp (in_plugin->name, "mpc") || !strcmp (in_plugin->name, "gif"))
+-      rank = GST_RANK_MARGINAL;
++      rank = GST_RANK_PRIMARY*200;
+     else
+-      rank = GST_RANK_NONE;
++      rank = GST_RANK_PRIMARY*100;
+ 
+     p = name = g_strdup (in_plugin->name);
+     while (*p) {

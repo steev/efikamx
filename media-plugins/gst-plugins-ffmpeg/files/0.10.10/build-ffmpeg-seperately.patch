@@ -1,0 +1,11 @@
+--- ./configure.ac.orig	2010-10-11 03:35:03.847499964 +0200
++++ ./configure.ac	2010-10-11 03:35:08.927299825 +0200
+@@ -373,7 +373,7 @@
+ 
+      AS_MKDIR_P(["$ac_top_build_prefix"gst-libs/ext/ffmpeg])
+      cd "$ac_top_build_prefix"gst-libs/ext/ffmpeg &&
+-         $confcmd $embffmpeg_configure_args ||
++         echo $confcmd $embffmpeg_configure_args ||
+          AC_MSG_ERROR([Failed to configure embedded FFmpeg tree])
+      cd "$origdir"
+     ],
