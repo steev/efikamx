@@ -1,8 +1,7 @@
-diff --git a/docs/gst/gstreamer-sections.txt b/docs/gst/gstreamer-sections.txt
-index b5cbad2..dae05d7 100644
---- a/docs/gst/gstreamer-sections.txt
-+++ b/docs/gst/gstreamer-sections.txt
-@@ -212,6 +212,49 @@ gst_buffer_copy_flags_get_type
+diff -ruN gstreamer-0.10.30/docs/gst/gstreamer-sections.txt gstreamer-0.10.30.fsl/docs/gst/gstreamer-sections.txt
+--- gstreamer-0.10.30/docs/gst/gstreamer-sections.txt	2010-07-15 04:46:19.000000000 -0500
++++ gstreamer-0.10.30.fsl/docs/gst/gstreamer-sections.txt	2010-10-08 13:48:59.097426897 -0500
+@@ -212,6 +212,49 @@
  </SECTION>
  
  <SECTION>
@@ -52,11 +51,10 @@ index b5cbad2..dae05d7 100644
  <FILE>gstbufferlist</FILE>
  <TITLE>GstBufferList</TITLE>
  GstBufferList
-diff --git a/gst/Makefile.am b/gst/Makefile.am
-index 7ea62e4..d844844 100644
---- a/gst/Makefile.am
-+++ b/gst/Makefile.am
-@@ -56,6 +56,7 @@ libgstreamer_@GST_MAJORMINOR@_la_SOURCES = \
+diff -ruN gstreamer-0.10.30/gst/Makefile.am gstreamer-0.10.30.fsl/gst/Makefile.am
+--- gstreamer-0.10.30/gst/Makefile.am	2010-04-14 05:38:27.000000000 -0500
++++ gstreamer-0.10.30.fsl/gst/Makefile.am	2010-10-08 13:49:00.017433144 -0500
+@@ -56,6 +56,7 @@
  	gstobject.c		\
  	gstbin.c		\
  	gstbuffer.c		\
@@ -64,7 +62,7 @@ index 7ea62e4..d844844 100644
  	gstbufferlist.c		\
  	gstbus.c		\
  	gstcaps.c		\
-@@ -146,6 +147,7 @@ gst_headers =			\
+@@ -146,6 +147,7 @@
  	gstobject.h		\
  	gstbin.h		\
  	gstbuffer.h		\
@@ -72,20 +70,21 @@ index 7ea62e4..d844844 100644
  	gstbufferlist.h		\
  	gstbus.h		\
  	gstcaps.h		\
-diff --git a/gst/Makefile.in b/gst/Makefile.in
-index bb3359d..49d9ac3 100644
---- a/gst/Makefile.in
-+++ b/gst/Makefile.in
-@@ -115,7 +115,7 @@ libgstreamer_@GST_MAJORMINOR@_la_DEPENDENCIES = $(am__DEPENDENCIES_1) \
+diff -ruN gstreamer-0.10.30/gst/Makefile.in gstreamer-0.10.30.fsl/gst/Makefile.in
+--- gstreamer-0.10.30/gst/Makefile.in	2010-07-15 04:20:01.000000000 -0500
++++ gstreamer-0.10.30.fsl/gst/Makefile.in	2010-10-08 13:50:28.117423646 -0500
+@@ -115,8 +115,8 @@
  	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2) \
  	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_2)
  am__libgstreamer_@GST_MAJORMINOR@_la_SOURCES_DIST = gst.c gstobject.c \
 -	gstbin.c gstbuffer.c gstbufferlist.c gstbus.c gstcaps.c \
-+	gstbin.c gstbuffer.c gstmfwbuffer.c gstbufferlist.c gstbus.c gstcaps.c \
- 	gstchildproxy.c gstclock.c gstdebugutils.c gstelement.c \
+-	gstchildproxy.c gstclock.c gstdebugutils.c gstelement.c \
++	gstbin.c gstbuffer.c gstmfwbuffer.c gstbufferlist.c gstbus.c \
++	gstcaps.c gstchildproxy.c gstclock.c gstdebugutils.c gstelement.c \
  	gstelementfactory.c gsterror.c gstevent.c gstfilter.c \
  	gstformat.c gstghostpad.c gstindex.c gstindexfactory.c \
-@@ -136,6 +136,7 @@ am_libgstreamer_@GST_MAJORMINOR@_la_OBJECTS =  \
+ 	gstinfo.c gstinterface.c gstiterator.c gstmessage.c \
+@@ -136,6 +136,7 @@
  	libgstreamer_@GST_MAJORMINOR@_la-gstobject.lo \
  	libgstreamer_@GST_MAJORMINOR@_la-gstbin.lo \
  	libgstreamer_@GST_MAJORMINOR@_la-gstbuffer.lo \
@@ -93,7 +92,7 @@ index bb3359d..49d9ac3 100644
  	libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.lo \
  	libgstreamer_@GST_MAJORMINOR@_la-gstbus.lo \
  	libgstreamer_@GST_MAJORMINOR@_la-gstcaps.lo \
-@@ -562,6 +563,7 @@ libgstreamer_@GST_MAJORMINOR@_la_SOURCES = \
+@@ -562,6 +563,7 @@
  	gstobject.c		\
  	gstbin.c		\
  	gstbuffer.c		\
@@ -101,7 +100,7 @@ index bb3359d..49d9ac3 100644
  	gstbufferlist.c		\
  	gstbus.c		\
  	gstcaps.c		\
-@@ -654,6 +656,7 @@ gst_headers = \
+@@ -654,6 +656,7 @@
  	gstobject.h		\
  	gstbin.h		\
  	gstbuffer.h		\
@@ -109,7 +108,7 @@ index bb3359d..49d9ac3 100644
  	gstbufferlist.h		\
  	gstbus.h		\
  	gstcaps.h		\
-@@ -862,6 +865,7 @@ distclean-compile:
+@@ -862,6 +865,7 @@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstutils.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstvalue.Plo@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstxml.Plo@am__quote@
@@ -117,7 +116,7 @@ index bb3359d..49d9ac3 100644
  
  .c.o:
  @am__fastdepCC_TRUE@	$(AM_V_CC)$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
-@@ -919,6 +923,12 @@ libgstreamer_@GST_MAJORMINOR@_la-gstbuffer.lo: gstbuffer.c
+@@ -919,6 +923,12 @@
  @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
  @am__fastdepCC_FALSE@	$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstreamer_@GST_MAJORMINOR@_la_CFLAGS) $(CFLAGS) -c -o libgstreamer_@GST_MAJORMINOR@_la-gstbuffer.lo `test -f 'gstbuffer.c' || echo '$(srcdir)/'`gstbuffer.c
  
@@ -130,11 +129,10 @@ index bb3359d..49d9ac3 100644
  libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.lo: gstbufferlist.c
  @am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libgstreamer_@GST_MAJORMINOR@_la_CFLAGS) $(CFLAGS) -MT libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.lo -MD -MP -MF $(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.Tpo -c -o libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.lo `test -f 'gstbufferlist.c' || echo '$(srcdir)/'`gstbufferlist.c
  @am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.Tpo $(DEPDIR)/libgstreamer_@GST_MAJORMINOR@_la-gstbufferlist.Plo
-diff --git a/gst/gst.c b/gst/gst.c
-index 18d346d..84da1cd 100644
---- a/gst/gst.c
-+++ b/gst/gst.c
-@@ -746,6 +746,7 @@ init_post (GOptionContext * context, GOptionGroup * group, gpointer data,
+diff -ruN gstreamer-0.10.30/gst/gst.c gstreamer-0.10.30.fsl/gst/gst.c
+--- gstreamer-0.10.30/gst/gst.c	2010-06-30 19:24:56.000000000 -0500
++++ gstreamer-0.10.30.fsl/gst/gst.c	2010-10-08 13:48:59.097426897 -0500
+@@ -746,6 +746,7 @@
    gst_caps_get_type ();
    _gst_event_initialize ();
    _gst_buffer_initialize ();
@@ -142,10 +140,9 @@ index 18d346d..84da1cd 100644
    _gst_buffer_list_initialize ();
    _gst_message_initialize ();
    _gst_tag_initialize ();
-diff --git a/gst/gst.h b/gst/gst.h
-index 4a92948..8c91df5 100644
---- a/gst/gst.h
-+++ b/gst/gst.h
+diff -ruN gstreamer-0.10.30/gst/gst.h gstreamer-0.10.30.fsl/gst/gst.h
+--- gstreamer-0.10.30/gst/gst.h	2010-06-22 19:01:19.000000000 -0500
++++ gstreamer-0.10.30.fsl/gst/gst.h	2010-10-08 13:48:59.107436147 -0500
 @@ -33,6 +33,7 @@
  
  #include <gst/gstbin.h>
@@ -154,11 +151,10 @@ index 4a92948..8c91df5 100644
  #include <gst/gstbufferlist.h>
  #include <gst/gstcaps.h>
  #include <gst/gstchildproxy.h>
-diff --git a/gst/gst_private.h b/gst/gst_private.h
-index 36e03ef..8056dc7 100644
---- a/gst/gst_private.h
-+++ b/gst/gst_private.h
-@@ -94,6 +94,7 @@ void _priv_gst_quarks_initialize (void);
+diff -ruN gstreamer-0.10.30/gst/gst_private.h gstreamer-0.10.30.fsl/gst/gst_private.h
+--- gstreamer-0.10.30/gst/gst_private.h	2010-06-30 19:24:56.000000000 -0500
++++ gstreamer-0.10.30.fsl/gst/gst_private.h	2010-10-08 13:49:00.017433144 -0500
+@@ -94,6 +94,7 @@
   * headers, so at least the symbols need to continue to be available unless
   * we want enterprise edition packagers dancing on our heads) */
  void  _gst_buffer_initialize (void);
@@ -166,7 +162,7 @@ index 36e03ef..8056dc7 100644
  void  _gst_buffer_list_initialize (void);
  void  _gst_event_initialize (void);
  void  _gst_format_initialize (void);
-@@ -158,6 +159,7 @@ GST_EXPORT GstDebugCategory *GST_CAT_PARENTAGE;
+@@ -158,6 +159,7 @@
  GST_EXPORT GstDebugCategory *GST_CAT_STATES;
  GST_EXPORT GstDebugCategory *GST_CAT_SCHEDULING;
  GST_EXPORT GstDebugCategory *GST_CAT_BUFFER;
@@ -174,7 +170,7 @@ index 36e03ef..8056dc7 100644
  GST_EXPORT GstDebugCategory *GST_CAT_BUFFER_LIST;
  GST_EXPORT GstDebugCategory *GST_CAT_BUS;
  GST_EXPORT GstDebugCategory *GST_CAT_CAPS;
-@@ -198,6 +200,7 @@ extern GstDebugCategory *_priv_GST_CAT_POLL;
+@@ -198,6 +200,7 @@
  #define GST_CAT_SCHEDULING       NULL
  #define GST_CAT_DATAFLOW         NULL
  #define GST_CAT_BUFFER           NULL
@@ -182,11 +178,10 @@ index 36e03ef..8056dc7 100644
  #define GST_CAT_BUFFER_LIST      NULL
  #define GST_CAT_BUS              NULL
  #define GST_CAT_CAPS             NULL
-diff --git a/gst/gstinfo.c b/gst/gstinfo.c
-index 02a2c94..46b5237 100644
---- a/gst/gstinfo.c
-+++ b/gst/gstinfo.c
-@@ -141,6 +141,7 @@ GstDebugCategory *GST_CAT_STATES = NULL;
+diff -ruN gstreamer-0.10.30/gst/gstinfo.c gstreamer-0.10.30.fsl/gst/gstinfo.c
+--- gstreamer-0.10.30/gst/gstinfo.c	2010-06-30 19:24:56.000000000 -0500
++++ gstreamer-0.10.30.fsl/gst/gstinfo.c	2010-10-08 13:48:59.117440773 -0500
+@@ -141,6 +141,7 @@
  GstDebugCategory *GST_CAT_SCHEDULING = NULL;
  
  GstDebugCategory *GST_CAT_BUFFER = NULL;
@@ -194,7 +189,7 @@ index 02a2c94..46b5237 100644
  GstDebugCategory *GST_CAT_BUFFER_LIST = NULL;
  GstDebugCategory *GST_CAT_BUS = NULL;
  GstDebugCategory *GST_CAT_CAPS = NULL;
-@@ -351,6 +352,8 @@ _gst_debug_init (void)
+@@ -351,6 +352,8 @@
        GST_DEBUG_BOLD | GST_DEBUG_FG_MAGENTA, NULL);
    GST_CAT_BUFFER = _gst_debug_category_new ("GST_BUFFER",
        GST_DEBUG_BOLD | GST_DEBUG_BG_GREEN, NULL);
@@ -203,11 +198,9 @@ index 02a2c94..46b5237 100644
    GST_CAT_BUFFER_LIST = _gst_debug_category_new ("GST_BUFFER_LIST",
        GST_DEBUG_BOLD | GST_DEBUG_BG_GREEN, NULL);
    GST_CAT_BUS = _gst_debug_category_new ("GST_BUS", GST_DEBUG_BG_YELLOW, NULL);
-diff --git a/gst/gstmfwbuffer.c b/gst/gstmfwbuffer.c
-new file mode 100644
-index 0000000..55875cb
---- /dev/null
-+++ b/gst/gstmfwbuffer.c
+diff -ruN gstreamer-0.10.30/gst/gstmfwbuffer.c gstreamer-0.10.30.fsl/gst/gstmfwbuffer.c
+--- gstreamer-0.10.30/gst/gstmfwbuffer.c	1969-12-31 18:00:00.000000000 -0600
++++ gstreamer-0.10.30.fsl/gst/gstmfwbuffer.c	2010-10-08 13:49:00.007420144 -0500
 @@ -0,0 +1,222 @@
 +/*
 + * Copyright (C) 2010 Freescale Semiconductor, Inc. All rights reserved.
@@ -431,11 +424,9 @@ index 0000000..55875cb
 +    GST_MINI_OBJECT_FLAG_SET(buffer, GST_MINI_OBJECT_FLAG_READONLY);
 +}
 +
-diff --git a/gst/gstmfwbuffer.h b/gst/gstmfwbuffer.h
-new file mode 100644
-index 0000000..382e0bb
---- /dev/null
-+++ b/gst/gstmfwbuffer.h
+diff -ruN gstreamer-0.10.30/gst/gstmfwbuffer.h gstreamer-0.10.30.fsl/gst/gstmfwbuffer.h
+--- gstreamer-0.10.30/gst/gstmfwbuffer.h	1969-12-31 18:00:00.000000000 -0600
++++ gstreamer-0.10.30.fsl/gst/gstmfwbuffer.h	2010-10-08 13:49:00.007420144 -0500
 @@ -0,0 +1,121 @@
 +/*
 + * Copyright (C) 2010 Freescale Semiconductor, Inc. All rights reserved.
@@ -558,11 +549,10 @@ index 0000000..382e0bb
 +
 +#endif /* __GstMfwBuffer_H__ */
 +
-diff --git a/win32/common/libgstreamer.def b/win32/common/libgstreamer.def
-index d16775b..16ae814 100644
---- a/win32/common/libgstreamer.def
-+++ b/win32/common/libgstreamer.def
-@@ -2,6 +2,7 @@ EXPORTS
+diff -ruN gstreamer-0.10.30/win32/common/libgstreamer.def gstreamer-0.10.30.fsl/win32/common/libgstreamer.def
+--- gstreamer-0.10.30/win32/common/libgstreamer.def	2010-07-12 08:03:38.000000000 -0500
++++ gstreamer-0.10.30.fsl/win32/common/libgstreamer.def	2010-10-08 13:49:00.067433898 -0500
+@@ -2,6 +2,7 @@
  	GST_CAT_AUTOPLUG DATA
  	GST_CAT_AUTOPLUG_ATTEMPT DATA
  	GST_CAT_BUFFER DATA
