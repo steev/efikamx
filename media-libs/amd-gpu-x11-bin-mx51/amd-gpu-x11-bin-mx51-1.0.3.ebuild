@@ -2,11 +2,10 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
+MY_P=${PN}-${PV}-20110310
 DESCRIPTION="Kernel modules and binary libraries for the imx-gpu"
 HOMEPAGE=""
-SRC_URI="http://ubersekret.com/distfiles/${P}.tar.gz"
-#http://ubersekret.com/distfiles/amd-gpu-x11-bin-mx51-10.08.01.tar.gz
-RESTRICT="fetch"
+SRC_URI="http://ubersekret.com/distfiles/${MY_P}.tar.bz2"
 
 LICENSE="Freescale"
 SLOT="0"
@@ -20,12 +19,12 @@ RDEPEND="!media-libs/amd-gpu-x11-bin-mx51
 		 x11-libs/libXext
 		 x11-libs/libXdmcp
 		 x11-libs/libXau"
-
+S="${WORKDIR}/${MY_P}"
 src_install () {
-	# kernel module
-	cp -a "${S}/lib" ${D}
-	# libraries
+	# We do it this way because just recursively adding everything makes it an
+	# non-symlink.
 	insinto /usr
-	doins -r "${S}/usr/lib"
+	cp -dpR "${S}/usr/lib" "${D}/usr/lib"
+	insinto /usr
 	doins -r "${S}/usr/include"
 }
