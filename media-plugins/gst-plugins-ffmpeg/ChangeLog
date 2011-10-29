@@ -135,7 +135,7 @@
   recommending against it. Debian, Ubuntu and a few others are already doing
   this, though.
 
-  22 Feb 2008; Zaheer Abbas Merali <zaheerm@gentoo.org> 
+  22 Feb 2008; Zaheer Abbas Merali <zaheerm@gentoo.org>
   gst-plugins-ffmpeg-0.10.1-r1.ebuild,
   gst-plugins-ffmpeg-0.10.2.ebuild, gst-plugins-ffmpeg-0.10.3.ebuild:
   fix up deps; bug #210509

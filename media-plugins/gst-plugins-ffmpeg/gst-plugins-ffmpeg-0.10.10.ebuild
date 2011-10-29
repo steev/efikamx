@@ -46,7 +46,7 @@ src_compile() {
 		myconf="${myconf} --cpu=$i"
 		break
 	done
-	
+
 	# cross compile support
 	if tc-is-cross-compiler ; then
 		myconf="${myconf} --enable-cross-compile --arch=$(tc-arch-kernel) --cross-prefix=${CHOST}-"
@@ -62,7 +62,7 @@ src_compile() {
 				;;
 		esac
 	fi
-	
+
 	cd ${S}/gst-libs/ext/ffmpeg
 	#econf \
 	#	--extra-cflags="${CFLAGS}"|| die "emake failed."

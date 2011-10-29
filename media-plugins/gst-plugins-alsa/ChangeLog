@@ -264,7 +264,7 @@
 
 *gst-plugins-alsa-0.10.16 (30 Jan 2008)
 
-  30 Jan 2008; Zaheer Merali <zaheerm@gentoo.org> 
+  30 Jan 2008; Zaheer Merali <zaheerm@gentoo.org>
   +gst-plugins-alsa-0.10.16.ebuild:
   version bump
 
