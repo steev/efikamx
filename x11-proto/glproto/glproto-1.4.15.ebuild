@@ -23,7 +23,7 @@ pkg_postinst() {
 }
 
 dynamic_libgl_install() {
-	local gl_dir= /usr/$(get_libdir)/opengl/xorg-x11/include/GL
+	local gl_dir=/usr/$(get_libdir)/opengl/xorg-x11/include/GL
 	# next section is to setup the dynamic libGL stuff
 	ebegin "Moving GL files for dynamic switching"
 		dodir ${gl_dir}
