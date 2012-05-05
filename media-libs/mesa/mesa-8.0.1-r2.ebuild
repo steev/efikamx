@@ -273,22 +273,22 @@ src_install() {
 	# Move libGL and others from /usr/lib to /usr/lib/opengl/blah/lib
 	# because user can eselect desired GL provider.
 	ebegin "Moving libGL and friends for dynamic switching"
-		dodir /usr/$(get_libdir)/opengl/${OPENGL_DIR}/{lib,extensions,include}
+	local gl_dir="/usr/$(get_libdir)/opengl/${OPENGL_DIR}/"
+		dodir ${gl_dir}/{lib,extensions,include}
 		local x
 		for x in "${ED}"/usr/$(get_libdir)/lib{EGL,GL*,OpenVG}.{la,a,so*}; do
 			if [ -f ${x} -o -L ${x} ]; then
-				mv -f "${x}" "${ED}"/usr/$(get_libdir)/opengl/${OPENGL_DIR}/lib \
+				mv -f "${x}" "${ED}"/${gl_dir}/lib \
 					|| die "Failed to move ${x}"
 			fi
 		done
 		for x in "${ED}"/usr/include/GL/{gl.h,glx.h,glext.h,glxext.h}; do
 			if [ -f ${x} -o -L ${x} ]; then
-				mv -f "${x}" "${ED}"/usr/$(get_libdir)/opengl/${OPENGL_DIR}/include \
+				mv -f "${x}" "${ED}"/${gl_dir}/include/GL \
 					|| die "Failed to move ${x}"
 			fi
 		done
-		mv "${ED}"/usr/include/{EGL,GLES*,VG,KHR}/ \
-			"${ED}"/usr/$(get_libdir)/opengl/${OPENGL_DIR}/include \
+		mv "${ED}"/usr/include/{EGL,GLES*,VG,KHR}/ "${ED}"/${gl_dir}/include \
 			|| die "Failed to move headers"
 	eend $?
 
