@@ -274,7 +274,7 @@ src_install() {
 	# because user can eselect desired GL provider.
 	ebegin "Moving libGL and friends for dynamic switching"
 	local gl_dir="/usr/$(get_libdir)/opengl/${OPENGL_DIR}/"
-		dodir ${gl_dir}/{lib,extensions,include}
+		dodir ${gl_dir}/{lib,extensions,include/GL}
 		local x
 		for x in "${ED}"/usr/$(get_libdir)/lib{EGL,GL*,OpenVG}.{la,a,so*}; do
 			if [ -f ${x} -o -L ${x} ]; then
