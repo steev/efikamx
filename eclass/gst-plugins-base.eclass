@@ -17,11 +17,11 @@
 inherit eutils gst-plugins10
 
 GST_EXPF="src_unpack src_compile src_install"
-case ${EAPI:-0} in                                                                  
-	2|3) GST_EXPF="${GST_EXPF} src_prepare src_configure" ;;                
-	1|0) ;;                                                                     
-	*) die "Unknown EAPI" ;;                                                   
-esac                                                                                
+case ${EAPI:-0} in
+	2|3) GST_EXPF="${GST_EXPF} src_prepare src_configure" ;;
+	1|0) ;;
+	*) die "Unknown EAPI" ;;
+esac
 EXPORT_FUNCTIONS ${GST_EXPF}
 
 ###
